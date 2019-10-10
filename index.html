@@ -262,7 +262,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/08/05/iOS适配方案/">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/08/18/iOS响应链之事件传递和响应/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Haven">
@@ -281,7 +281,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/08/05/iOS适配方案/" itemprop="url">iOS适配方案</a></h1>
+                <a class="post-title-link" href="/2017/08/18/iOS响应链之事件传递和响应/" itemprop="url">iOS响应链之事件传递和响应</a></h1>
         
 
         <div class="post-meta">
@@ -293,8 +293,143 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-05T19:23:05+08:00">
-                2017-08-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-18T21:23:05+08:00">
+                2017-08-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)</p>
+<h3 id="事件传递"><a href="#事件传递" class="headerlink" title="事件传递"></a>事件传递</h3><p>事件传递是从父控件传递到子控件的, 当检测到手指触摸（Touch）操作时会将其打包成一个UIEvent对象，并放入当前活动UIApplication的事件队列中, UIApplication会从事件队列中取出触摸事件并传递给UIWindow, 一直传递到一个最合适的视图View来处理事件</p>
+<p>传递顺序: UIApplication —&gt;UIWindow —&gt;Subview —&gt; View</p>
+<p>系统是怎么找出最合适的View的呢, 依赖hitTest:withEvent:方法去判断点击的点是否在当前View内,  如果是则便利当前View的SubView继续调用hitTest:withEvent:方法, 直到找到最合适的View, 如下图(图片来源网络)</p>
+<p><img src="/2017/08/18/iOS响应链之事件传递和响应/Responder1.png" alt></p>
+<p><img src="/2017/08/18/iOS响应链之事件传递和响应/Responder3.png" alt></p>
+<p>注意⚠️: 遍历subVIews是根据当前subview的index顺序，index越大就越先被访问</p>
+<h3 id="事件响应"><a href="#事件响应" class="headerlink" title="事件响应"></a>事件响应</h3><p><img src="/2017/08/18/iOS响应链之事件传递和响应/Responder2.png" alt></p>
+<p>首先看initial view能否处理这个事件，如果不能则会将事件传递给其上级视图（inital view的superView）；如果上级视图仍然无法处理则会继续往上传递；一直传递到视图控制器view controller，首先判断视图控制器的根视图view是否能处理此事件；如果不能则接着判断该视图控制器能否处理此事件，如果还是不能则继续向上传 递；（对于第二个图视图控制器本身还在另一个视图控制器中，则继续交给父视图控制器的根视图，如果根视图不能处理则交给父视图控制器处理）；一直到 window，如果window还是不能处理此事件则继续交给application处理，如果最后application还是不能处理此事件则将其丢弃</p>
+<figure class="highlight plain"><figcaption><span>(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event &#123;</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// 1.判断当前控件能否接收事件</span><br><span class="line">if (self.userInteractionEnabled == NO || self.hidden == YES || self.alpha &lt;= 0.01) return nil;</span><br><span class="line">// 2. 判断点在不在当前控件</span><br><span class="line">if ([self pointInside:point withEvent:event] == NO) return nil;</span><br><span class="line">// 3.从后往前遍历自己的子控件</span><br><span class="line">NSInteger count = self.subviews.count;</span><br><span class="line">for (NSInteger i = count - 1; i &gt;= 0; i--) &#123;</span><br><span class="line">   UIView *childView = self.subviews[I];</span><br><span class="line">   // 把当前控件上的坐标系转换成子控件上的坐标系</span><br><span class="line">   CGPoint childP = [self convertPoint:point toView:childView];</span><br><span class="line">   UIView *fitView = [childView hitTest:childP withEvent:event];</span><br><span class="line">   if (fitView) &#123; // 寻找到最合适的view</span><br><span class="line">     return fitView;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">// 循环结束,表示没有比自己更合适的view</span><br><span class="line">return self;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>问题: 子View 是 UIView时，如果没有添加手势，点击子 View时，会由其父View来响应，而 子View 是 UIControl 时，子View 没有添加手势，一样不会由 父View 来响应</p>
+<p>原因: UIControl默认实现了以下方法</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;</span><br><span class="line">- (<span class="keyword">void</span>)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event;</span><br><span class="line">- (<span class="keyword">void</span>)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event;</span><br><span class="line">- (<span class="keyword">void</span>)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event;</span><br></pre></td></tr></table></figure>
+
+<p>如果某个控件实现了touches…方法，则这个事件将由该控件来接受，如果调用了[supertouches….];就会将事件顺着响应者链条往上传递，传递给上一个响应者；接着就会调用上一个响应者的touches….方法</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/08/10/iOS适配方案/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Haven">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haven">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/08/10/iOS适配方案/" itemprop="url">iOS适配方案</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-10T19:43:05+08:00">
+                2017-08-10
               </time>
             
 
@@ -467,6 +602,7 @@
 <p>如果我们以宽适配, 将设计稿的宽拉伸或者缩小到设备的宽, 拉伸或者缩小到比例(x)就是<strong>deviceW / designW</strong>, 设备宽度除以设计稿宽度</p>
 <p><strong>deviceW / designW = vw / dw</strong>   </p>
 <p><strong>vw = dw * deviceW / designW</strong> </p>
+<p>例如: 设计稿是以6为标准, 那么设计稿的宽designW = 375,  设备宽为deviceW = MIN([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)  设计稿中控件的宽dw = 100, 那么最终实际设备中的宽vw = [UIScreen mainScreen].bounds.size.width / 375 * 100</p>
 <p>如果我们以高适配, 将设计稿的高拉伸或者缩小到设备的宽, 拉伸或者缩小到比例(x)就是<strong>deviceH / designH</strong>, 设备高度除以设计稿高度</p>
 <p><strong>deviceH / designH = vw / dw</strong>   </p>
 <p><strong>vw = dw * deviceH / designH</strong> </p>
@@ -549,7 +685,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-30T15:23:05+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-30T19:23:05+08:00">
                 2017-07-30
               </time>
             
@@ -714,7 +850,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
