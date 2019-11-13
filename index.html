@@ -566,6 +566,156 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/10/19/@property@synthesize@dynamic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Haven">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haven的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/19/@property@synthesize@dynamic/" itemprop="url">ios之@property @synthesize @dynamic</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-19T20:10:05+08:00">
+                2017-10-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h6 id="property"><a href="#property" class="headerlink" title="@property"></a><strong>@property</strong></h6><p>@property属性 =  带下划线的实例变量 + getter和setter方法</p>
+<p>当定义一个属性@property时, 系统会自动生成一个带下划线的实例变量, 还有setter getter方法, 这个过程是在编译的时候进行自动合成的.</p>
+<p>@property修饰符有四种</p>
+<ol>
+<li>原子性,  比较消耗性能</li>
+<li>读取权限,</li>
+<li>内存管理, 有assign、strong、weak、copy、unsafe_unretained</li>
+<li>set、get方法名, 可以指定setter和getter方法</li>
+</ol>
+<h5 id="synthesize"><a href="#synthesize" class="headerlink" title="@synthesize"></a>@synthesize</h5><p>iOS6之前,@property 与 @synthesize需要搭配使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@synthesize propertyName = _propertyName;</span><br></pre></td></tr></table></figure>
+
+<p>上面这个方法表示, 生成一个下划线的属性, 同时自动生成getter和setter方法, 可以用此方法重新定义变量名, 但是不建议这么做</p>
+<h5 id="dynamic-动态合成"><a href="#dynamic-动态合成" class="headerlink" title="@dynamic 动态合成"></a>@dynamic 动态合成</h5><p>@dynamic name;</p>
+<p>需要自己定义属性的变量名, setter方法 getter方法</p>
+<ul>
+<li><p>setter方法和getter方法实质</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- (void)setCar:(Car *)car &#123;</span><br><span class="line">  if (_car != car) &#123; </span><br><span class="line">   [_car release];</span><br><span class="line">   _car = [car retain]; </span><br><span class="line">  &#125; </span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line">- (Car *)car &#123;</span><br><span class="line"> return _car; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li><p>访问变量用下划线访问和self访问的区别</p>
+<p>下划线访问是直接访问实例变量的内存位置, 速度相对更快,  但是此时KVO无法触发,因为KVO是基于setter方法,  只有self方式调用才会触发KVO, self使用变量实际上是调用变量getter方法</p>
+</li>
+<li><p>为什么不能同时重写setter和getter方法?</p>
+<p> 如果同时重写了setter和getter方法, 编译会报错, 会提示找不到变量, 因为此时编译器认为开发者想自己管理@property, 但是又没有手动定义变量, 所以报错了</p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/10/10/iOS签名认证过程/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1416,7 +1566,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
