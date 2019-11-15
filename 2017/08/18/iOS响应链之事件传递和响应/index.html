@@ -79,21 +79,21 @@
 
 
 
-<meta name="description" content="iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件) 事件传递事件传递是从父控件传递到子控件的, 当检测到手指触摸（Touch）操作时会将其打包成一个UIEvent对象，并放入当前活动UI">
+<meta name="description" content="iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)">
 <meta name="keywords" content="iOS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS响应链之事件传递和响应">
 <meta property="og:url" content="https://HavenWWH.github.io/2017/08/18/iOS响应链之事件传递和响应/index.html">
 <meta property="og:site_name" content="Haven的博客">
-<meta property="og:description" content="iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件) 事件传递事件传递是从父控件传递到子控件的, 当检测到手指触摸（Touch）操作时会将其打包成一个UIEvent对象，并放入当前活动UI">
+<meta property="og:description" content="iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://havenwwh.github.io/2017/08/18/iOS响应链之事件传递和响应/Responder1.png">
 <meta property="og:image" content="https://havenwwh.github.io/2017/08/18/iOS响应链之事件传递和响应/Responder3.png">
 <meta property="og:image" content="https://havenwwh.github.io/2017/08/18/iOS响应链之事件传递和响应/Responder2.png">
-<meta property="og:updated_time" content="2019-10-10T08:19:56.854Z">
+<meta property="og:updated_time" content="2019-11-15T09:46:28.654Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS响应链之事件传递和响应">
-<meta name="twitter:description" content="iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件) 事件传递事件传递是从父控件传递到子控件的, 当检测到手指触摸（Touch）操作时会将其打包成一个UIEvent对象，并放入当前活动UI">
+<meta name="twitter:description" content="iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)">
 <meta name="twitter:image" content="https://havenwwh.github.io/2017/08/18/iOS响应链之事件传递和响应/Responder1.png">
 
 
@@ -335,6 +335,8 @@
 
       
         <p>iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)</p>
+<a id="more"></a>
+
 <h3 id="事件传递"><a href="#事件传递" class="headerlink" title="事件传递"></a>事件传递</h3><p>事件传递是从父控件传递到子控件的, 当检测到手指触摸（Touch）操作时会将其打包成一个UIEvent对象，并放入当前活动UIApplication的事件队列中, UIApplication会从事件队列中取出触摸事件并传递给UIWindow, 一直传递到一个最合适的视图View来处理事件</p>
 <p>传递顺序: UIApplication —&gt;UIWindow —&gt;Subview —&gt; View</p>
 <p>系统是怎么找出最合适的View的呢, 依赖hitTest:withEvent:方法去判断点击的点是否在当前View内,  如果是则便利当前View的SubView继续调用hitTest:withEvent:方法, 直到找到最合适的View, 如下图(图片来源网络)</p>

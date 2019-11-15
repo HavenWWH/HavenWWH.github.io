@@ -332,75 +332,15 @@
 
       
         
-          
-            <p><strong>MQTT</strong></p>
+          <p><strong>MQTT</strong></p>
 <p>基于发布/订阅模式的轻量级消息传输协议, 底层基于TCP/IP协议</p>
-<p><strong>两个端:</strong> </p>
-<p>Server/Broker: 负责接收消息,过滤消息并转发给消息订阅者</p>
-<p>Client: Broker之外的都是客户端，可以发布或订阅消息</p>
-<p><strong>三个角色:</strong> </p>
-<p>发布者Publisher    代理Broker   订阅者Subscriber    </p>
-<p>发布者和订阅者可以是同一个Client</p>
-<p><strong>消息转发的原理:</strong></p>
-<p>Publish/Subscribe模式是基于主题(topic)的消息转发系统，每个消息都会被贴上一个特定的topic，</p>
-<p>消息并不会直接发送给订阅者(Subscriber)，而是发布者(Publisher) 首先将带有topic的消息发送代理(broker)。</p>
-<p>订阅者可以从broker订阅自己相关的topic，当broker接收到发布过来的消息后，</p>
-<p>broker开始执行基于topic的过滤，将特定的消息转发给特定的订阅者。</p>
-<p><strong>Connect消息结构</strong></p>
-<p><img src="/2019/01/30/MQTT详解及使用/mqtt1.png" alt></p>
-<p><strong>基础概念:</strong></p>
-<p>MQTT使用过程遇到的一些专业名词解释</p>
-<p><strong>CleanSession</strong></p>
-<p>client和broker之间是否需要建立持久连接（CleanSession为false表示持久连接）,当使用QoS级别为1或2时, 服务端是否保存客户端连接的session, 包括订阅的主题,  Qos信息等, 下次连接的时候就不需要再次订阅主题, 而且还可以再次发送原来未完成的消息</p>
-<p><strong>KeepAlive</strong></p>
-<p>客户端发起PING Request的时间间隔，确保连接正常。客户端周期性地发送PING请求给broker，broker也会应答此心跳，这种机制可以保证双方知道对方是否还在线</p>
-<p><strong>Retained Messages(保留消息)</strong></p>
-<p>一台设备意外断开时Broker发送通告给其他相关设备。客户端在建立CONNECT连接时会将遗嘱打包在消息体里。如果这个客户端意外断开连接，broker将会发送遗嘱消息给其他关联的客户端</p>
-<p>1个Topic只有唯一的retain保留消息，Broker会保存每个Topic的最后一条retain消息,保留消息可以帮助新的订阅者在订阅主题后立即获取当前状态，而无须等待发布者发送下一条更新,如果不使用保留信息，订阅者在发布者发送间隔期将对当前状态一无所知</p>
-<p><strong>最后遗嘱Last will &amp; Testament:</strong></p>
-<p>包括Will topic 、will message 、 will Qos、will retain,在客户端 A 进行连接时候，遗嘱消息设定为”offline“，客户端 B 订阅这个遗嘱主题。当 A 异常断开时，客户端 B 会收到这个”offline“的遗嘱消息，从而知道客户端 A 离线了</p>
-<p><strong>服务质量(Qos)</strong> </p>
-<p>最多一次：发送一次，无需回复，消息有可能丢失。（传感器数据）</p>
-<p>至少一次：发送者没有收到接收者的反馈，过一段时间会重新发送，消息可能重复,确保消息到达</p>
-<p>只有一次：发送过程经过 PUBREC(发布收到)、PUBREL(发布释放)、PUBCOMP(发布完成)，保证一个包只收到一次</p>
-<p><strong>CONNACK消息</strong></p>
-<p>当broker收到一个CONNECT消息时，broker有义务应答一个CONNACK消息，CONNACK只包含两个数据字段，一个是Session present flag（当前会话标志），另一个是Return code（返回码）</p>
-<p><strong>Session Present Flag</strong></p>
-<p>broker是否保存和客户端建立过持久会话标识. 服务端是否保存过客户端的session, 如果客户端连接时cleanSession为true, 则当前flag永远为false,</p>
-<p><strong>Return Code（返回码）</strong></p>
-<p>0 接受连接 </p>
-<p>1 拒绝连接，不能被接受的协议版本 </p>
-<p>2 拒绝连接，ID无效 </p>
-<p>3 拒绝连接，服务器不可用 </p>
-<p>4 拒绝连接，错误的用户名和密码 </p>
-<p>5 拒绝连接，未经授权</p>
-<ul>
-<li>实例化类</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- (MQTTSessionManager *)sessionManager &#123;</span><br><span class="line">    if (!_sessionManager) &#123;</span><br><span class="line">        _sessionManager = [[MQTTSessionManager alloc] initWithPersistence:YES maxWindowSize:MQTT_MAX_WINDOW_SIZE maxMessages:MQTT_MAX_MESSAGES maxSize:MQTT_MAX_SIZE maxConnectionRetryInterval:64 connectInForeground:NO streamSSLLevel:nil queue:dispatch_get_main_queue()];</span><br><span class="line">        _sessionManager.delegate = self;</span><br><span class="line">        // 监听主题订阅状态</span><br><span class="line">        [_sessionManager addObserver:self</span><br><span class="line">                          forKeyPath:kMQTTKeyPath</span><br><span class="line">                             options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld</span><br><span class="line">                             context:nil];</span><br><span class="line">    &#125;</span><br><span class="line">    return _sessionManager;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>初始化并连接</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// 初始化并连接 MQTT端口（默认端口） 1883</span><br><span class="line">[self.sessionManager  connectTo:KMQTTServiceAddress port:1883 tls:NO keepalive:10 clean:YES auth:YES user:KMQTTUserName pass:KMQTTPassword will:NO willTopic:nil willMsg:nil willQos:MQTTQosLevelAtLeastOnce willRetainFlag:NO withClientId:client_id securityPolicy:nil certificates: nil protocolLevel:MQTTProtocolVersion311 connectHandler: nil];</span><br><span class="line"></span><br><span class="line">// 属性说明</span><br><span class="line">cleanSession: // 服务器是否保存客户端信息 为No表示保存</span><br><span class="line">will: // 当服务器检测到客户端由于除传输断开连接数据包的客户端以外的任何原因断开连接时，服务器必须发布一条Will消息</span><br><span class="line">willTopic: // willFlag标志设置为YES，则Will主题为字符串，否则为nil</span><br><span class="line">willMsg: // 将Will标志设置为YES，则必须指定Will消息，否则为nil</span><br><span class="line">willQoS: // 指定发布Will消息时使用的QoS级别。如果将Will标志设置为NO，则必须将Will QoS设置为0。如果将Will标志设置为YES，那么Will QoS的值可以是0 (0x00)、1 (0x01)或2 (0x02)。</span><br><span class="line">willRetainFlag: // 服务器是否应该使用retainFlag发布Will消息。如果将Will标志设置为NO，则必须将Will Retain标志设置为NO。如果Will标志设置为YES:如果Will Retain设置为NO，服务器必须将Will消息作为非保留发布发布[MQTT-3.1.2-14]。如果Will Retain设置为YES，服务器必须将Will消息作为保留发布</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>订阅主题</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 用户订阅主题</span><br><span class="line">self.sessionManager.subscriptions = [@&#123;roomTopic : @(1), userTopic : @(1)&#125; mutableCopy];</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>发送消息</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 发送消息</span><br><span class="line">[self.sessionManager sendData:contentData topic:self.roomTopic qos:MQTTQosLevelAtLeastOnce retain:NO];</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>接收消息</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//MARK: MQTT接收消息</span><br><span class="line">- (void)sessionManager:(MQTTSessionManager *)sessionManager</span><br><span class="line">     didReceiveMessage:(NSData *)data</span><br><span class="line">               onTopic:(NSString *)topic</span><br><span class="line">              retained:(BOOL)retained &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/01/30/MQTT详解及使用/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -518,7 +458,7 @@
       
         
           
-            
+            <a id="more"></a>
           
         
       
@@ -636,40 +576,14 @@
 
       
         
-          
-            <h6 id="property"><a href="#property" class="headerlink" title="@property"></a><strong>@property</strong></h6><p>@property属性 =  带下划线的实例变量 + getter和setter方法</p>
-<p>当定义一个属性@property时, 系统会自动生成一个带下划线的实例变量, 还有setter getter方法, 这个过程是在编译的时候进行自动合成的.</p>
-<p>@property修饰符有四种</p>
-<ol>
-<li>原子性,  比较消耗性能</li>
-<li>读取权限,</li>
-<li>内存管理, 有assign、strong、weak、copy、unsafe_unretained</li>
-<li>set、get方法名, 可以指定setter和getter方法</li>
-</ol>
-<h5 id="synthesize"><a href="#synthesize" class="headerlink" title="@synthesize"></a>@synthesize</h5><p>iOS6之前,@property 与 @synthesize需要搭配使用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@synthesize propertyName = _propertyName;</span><br></pre></td></tr></table></figure>
-
-<p>上面这个方法表示, 生成一个下划线的属性, 同时自动生成getter和setter方法, 可以用此方法重新定义变量名, 但是不建议这么做</p>
-<h5 id="dynamic-动态合成"><a href="#dynamic-动态合成" class="headerlink" title="@dynamic 动态合成"></a>@dynamic 动态合成</h5><p>@dynamic name;</p>
-<p>需要自己定义属性的变量名, setter方法 getter方法</p>
-<ul>
-<li><p>setter方法和getter方法实质</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- (void)setCar:(Car *)car &#123;</span><br><span class="line">  if (_car != car) &#123; </span><br><span class="line">   [_car release];</span><br><span class="line">   _car = [car retain]; </span><br><span class="line">  &#125; </span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line">- (Car *)car &#123;</span><br><span class="line"> return _car; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-<ul>
-<li><p>访问变量用下划线访问和self访问的区别</p>
-<p>下划线访问是直接访问实例变量的内存位置, 速度相对更快,  但是此时KVO无法触发,因为KVO是基于setter方法,  只有self方式调用才会触发KVO, self使用变量实际上是调用变量getter方法</p>
-</li>
-<li><p>为什么不能同时重写setter和getter方法?</p>
-<p> 如果同时重写了setter和getter方法, 编译会报错, 会提示找不到变量, 因为此时编译器认为开发者想自己管理@property, 但是又没有手动定义变量, 所以报错了</p>
-</li>
-</ul>
-
-          
+          <h6 id="property"><a href="#property" class="headerlink" title="@property"></a><strong>@property</strong></h6><p>@property属性 =  带下划线的实例变量 + getter和setter方法</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/10/19/@property@synthesize@dynamic/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -786,19 +700,15 @@
 
       
         
-          
-            <ol>
-<li>keychain里的“从证书颁发机构请求证书”，Mac上生成一对公私钥, CertificateSigningRequest(公钥L) , Mac上还有一份私钥L存在本地</li>
-<li>苹果后台一个私钥A     iOS设备一个公钥A</li>
-<li>CertificateSigningRequest(公钥L)上传到开发者账号关联App生成证书, 这个过程苹果后台私钥A与公钥L进行签名, 下载证书到本地</li>
-<li>生成pro描述文件, (APPID,  设备ID, 上一步的证书用私钥A去签名),下载到本地Mac</li>
-<li>编译App时, 用本地私钥L对App进行签名,  和描述文件(provisioning)一起打包安装到手机上</li>
-<li>安装时, 公钥A对描述文件进行验证, 再里面的签名证书(第三步生成的证书)</li>
-</ol>
-<p><img src="/2017/10/10/iOS签名认证过程/iosp12.jpeg" alt></p>
-<h3 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h3><h5 id="从AppStore下载App"><a href="#从AppStore下载App" class="headerlink" title="从AppStore下载App"></a>从AppStore下载App</h5><p>上传App到AppStore的时候, 苹果后台用私钥对App进行签名, 手机下载后, 手机公钥会验证签名, 通过则可以安装到手机上</p>
-
-          
+          <ol>
+<li><p>keychain里的“从证书颁发机构请求证书”，Mac上生成一对公私钥, CertificateSigningRequest(公钥L) , Mac上还有一份私钥L存在本地</p></li></ol>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/10/10/iOS签名认证过程/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -915,23 +825,14 @@
 
       
         
-          
-            <h4 id="removeFromSuperview"><a href="#removeFromSuperview" class="headerlink" title="removeFromSuperview"></a>removeFromSuperview</h4><p>苹果官方文档说明: 从当前视图的父视图和窗口中移除,同时从响应事件的响应者链中移除</p>
-<p>此方法做两件事情:</p>
-<ol>
-<li><p>在树形结构中找到该节点，从树型数据结构中删除该节点及其子节点</p>
-</li>
-<li><p>把该对象从响应者链中移除</p>
-</li>
-</ol>
-<p>注意⚠️: </p>
-<ol>
-<li>执行此方法后,会将当前视图视图从它的父视图中移除, 将父视图对它的强引用删除, 如果不存在其他强引用, 则当前视图会自动从内存中释放, 如果还存在其他强引用则不释放</li>
-<li>可以通过设置nil 从内存中移除</li>
-<li>多次执行removeFromSuperview不会报错</li>
-</ol>
-
-          
+          <h4 id="removeFromSuperview"><a href="#removeFromSuperview" class="headerlink" title="removeFromSuperview"></a>removeFromSuperview</h4><p>苹果官方文档说明: 从当前视图的父视图和窗口中移除,同时从响应事件的响应者链中移除</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/09/01/removeFromSuperview详解/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1048,25 +949,14 @@
 
       
         
-          
-            <p>iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)</p>
-<h3 id="事件传递"><a href="#事件传递" class="headerlink" title="事件传递"></a>事件传递</h3><p>事件传递是从父控件传递到子控件的, 当检测到手指触摸（Touch）操作时会将其打包成一个UIEvent对象，并放入当前活动UIApplication的事件队列中, UIApplication会从事件队列中取出触摸事件并传递给UIWindow, 一直传递到一个最合适的视图View来处理事件</p>
-<p>传递顺序: UIApplication —&gt;UIWindow —&gt;Subview —&gt; View</p>
-<p>系统是怎么找出最合适的View的呢, 依赖hitTest:withEvent:方法去判断点击的点是否在当前View内,  如果是则便利当前View的SubView继续调用hitTest:withEvent:方法, 直到找到最合适的View, 如下图(图片来源网络)</p>
-<p><img src="/2017/08/18/iOS响应链之事件传递和响应/Responder1.png" alt></p>
-<p><img src="/2017/08/18/iOS响应链之事件传递和响应/Responder3.png" alt></p>
-<p>注意⚠️: 遍历subVIews是根据当前subview的index顺序，index越大就越先被访问</p>
-<h3 id="事件响应"><a href="#事件响应" class="headerlink" title="事件响应"></a>事件响应</h3><p><img src="/2017/08/18/iOS响应链之事件传递和响应/Responder2.png" alt></p>
-<p>首先看initial view能否处理这个事件，如果不能则会将事件传递给其上级视图（inital view的superView）；如果上级视图仍然无法处理则会继续往上传递；一直传递到视图控制器view controller，首先判断视图控制器的根视图view是否能处理此事件；如果不能则接着判断该视图控制器能否处理此事件，如果还是不能则继续向上传 递；（对于第二个图视图控制器本身还在另一个视图控制器中，则继续交给父视图控制器的根视图，如果根视图不能处理则交给父视图控制器处理）；一直到 window，如果window还是不能处理此事件则继续交给application处理，如果最后application还是不能处理此事件则将其丢弃</p>
-<figure class="highlight plain"><figcaption><span>(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event &#123;</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// 1.判断当前控件能否接收事件</span><br><span class="line">if (self.userInteractionEnabled == NO || self.hidden == YES || self.alpha &lt;= 0.01) return nil;</span><br><span class="line">// 2. 判断点在不在当前控件</span><br><span class="line">if ([self pointInside:point withEvent:event] == NO) return nil;</span><br><span class="line">// 3.从后往前遍历自己的子控件</span><br><span class="line">NSInteger count = self.subviews.count;</span><br><span class="line">for (NSInteger i = count - 1; i &gt;= 0; i--) &#123;</span><br><span class="line">   UIView *childView = self.subviews[I];</span><br><span class="line">   // 把当前控件上的坐标系转换成子控件上的坐标系</span><br><span class="line">   CGPoint childP = [self convertPoint:point toView:childView];</span><br><span class="line">   UIView *fitView = [childView hitTest:childP withEvent:event];</span><br><span class="line">   if (fitView) &#123; // 寻找到最合适的view</span><br><span class="line">     return fitView;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">// 循环结束,表示没有比自己更合适的view</span><br><span class="line">return self;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>问题: 子View 是 UIView时，如果没有添加手势，点击子 View时，会由其父View来响应，而 子View 是 UIControl 时，子View 没有添加手势，一样不会由 父View 来响应</p>
-<p>原因: UIControl默认实现了以下方法</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;</span><br><span class="line">- (<span class="keyword">void</span>)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event;</span><br><span class="line">- (<span class="keyword">void</span>)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event;</span><br><span class="line">- (<span class="keyword">void</span>)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event;</span><br></pre></td></tr></table></figure>
-
-<p>如果某个控件实现了touches…方法，则这个事件将由该控件来接受，如果调用了[supertouches….];就会将事件顺着响应者链条往上传递，传递给上一个响应者；接着就会调用上一个响应者的touches….方法</p>
-
-          
+          <p>iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/08/18/iOS响应链之事件传递和响应/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1183,147 +1073,14 @@
 
       
         
-          
-            <p>苹果手机尺寸相关知识</p>
-<table>
-<thead>
-<tr>
-<th align="left">机型</th>
-<th align="left">分辨率</th>
-<th align="center">开发尺寸/物理尺寸</th>
-<th align="center">倍数</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">iPhone 11 Pro Max</td>
-<td align="left">1242x2688</td>
-<td align="center">414x896</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone 11 Pro</td>
-<td align="left">1125x2436</td>
-<td align="center">375x812</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone 11</td>
-<td align="left">828x1792</td>
-<td align="center">414x896</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPhone XS Max</td>
-<td align="left">1242x2688</td>
-<td align="center">414x896</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone XS</td>
-<td align="left">1125x2436</td>
-<td align="center">375x812</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone XR</td>
-<td align="left">828x1792</td>
-<td align="center">414x896</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPhone X</td>
-<td align="left">1125x2436</td>
-<td align="center">375x812</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone 6/6s/7/8</td>
-<td align="left">750x1334</td>
-<td align="center">375x667</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPhone 6 Plus/6s Plus/7 Plus/8 Plus</td>
-<td align="left">1242x2208</td>
-<td align="center">414x736</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone SE / 5C /5s / 5</td>
-<td align="left">640x1136</td>
-<td align="center">320x568</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPhone 4/4S</td>
-<td align="left">640x960</td>
-<td align="center">320x480</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPhone 3GS</td>
-<td align="left">320x480</td>
-<td align="center">320x480</td>
-<td align="center">@1x</td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="left"></td>
-<td align="center"></td>
-<td align="center"></td>
-</tr>
-<tr>
-<td align="left">iPad 7.9</td>
-<td align="left">1536x2048</td>
-<td align="center">768x1024</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPad 9.7</td>
-<td align="left">1536x2048</td>
-<td align="center">768x1024</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPad 10.2</td>
-<td align="left">1620x2160</td>
-<td align="center">810x1080</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPad 10.5</td>
-<td align="left">1668x2224</td>
-<td align="center">834x1112</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPad 11.0</td>
-<td align="left">1668x2388</td>
-<td align="center">834x1194</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPad 12.9</td>
-<td align="left">2048x2732</td>
-<td align="center">1024x1366</td>
-<td align="center">@2x</td>
-</tr>
-</tbody></table>
-<h5 id="适配方案-拉伸适配"><a href="#适配方案-拉伸适配" class="headerlink" title="适配方案:拉伸适配"></a>适配方案:拉伸适配</h5><p>designW : 设计稿的宽   iphone6为标准, 则设计稿的宽为375, 以6p为标准, 则设计稿的宽为414</p>
-<p>designH : 设计稿的高</p>
-<p>deviceW : 设备的宽</p>
-<p>deviceH : 设备的高</p>
-<p>dw : 设计稿中某个控件的位置</p>
-<p>vw : 最终在实际的设备中的位置</p>
-<p>如果我们以宽适配, 将设计稿的宽拉伸或者缩小到设备的宽, 拉伸或者缩小到比例(x)就是<strong>deviceW / designW</strong>, 设备宽度除以设计稿宽度</p>
-<p><strong>deviceW / designW = vw / dw</strong>   </p>
-<p><strong>vw = dw * deviceW / designW</strong> </p>
-<p>例如: 设计稿是以6为标准, 那么设计稿的宽designW = 375,  设备宽为deviceW = MIN([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)  设计稿中控件的宽dw = 100, 那么最终实际设备中的宽vw = [UIScreen mainScreen].bounds.size.width / 375 * 100</p>
-<p>如果我们以高适配, 将设计稿的高拉伸或者缩小到设备的宽, 拉伸或者缩小到比例(x)就是<strong>deviceH / designH</strong>, 设备高度除以设计稿高度</p>
-<p><strong>deviceH / designH = vw / dw</strong>   </p>
-<p><strong>vw = dw * deviceH / designH</strong> </p>
-
-          
+          <p>苹果手机尺寸相关知识</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/08/10/iOS适配方案/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1440,51 +1197,14 @@
 
       
         
-          
-            <p>Hexo是一款基于Node.js的静态博客框架,  可以在github page平台上托管我们的博客</p>
-<h2 id="搭建步骤"><a href="#搭建步骤" class="headerlink" title="搭建步骤"></a>搭建步骤</h2><h3 id="第一部分-环境配置"><a href="#第一部分-环境配置" class="headerlink" title="第一部分: 环境配置"></a>第一部分: 环境配置</h3><h4 id="1-安装nodejs和nodejs里面的npm工具-因为Hexo是基于nodejs编写的-访问Node-js官网下载"><a href="#1-安装nodejs和nodejs里面的npm工具-因为Hexo是基于nodejs编写的-访问Node-js官网下载" class="headerlink" title="1. 安装nodejs和nodejs里面的npm工具(因为Hexo是基于nodejs编写的)访问Node.js官网下载"></a>1. 安装nodejs和nodejs里面的npm工具(因为Hexo是基于nodejs编写的)访问<a href="https://links.jianshu.com/go?to=http%3A%2F%2Fadf.ly%2F21392453%2Fbanner%2Fnodejs.org%2Fzh-cn%2F" target="_blank" rel="noopener">Node.js官网</a>下载</h4><p>​    node -v 查看nodejs版本</p>
-<p>​    npm -v 查看npm版本</p>
-<h4 id="2-安装hexo-安装hexo-deployer插件"><a href="#2-安装hexo-安装hexo-deployer插件" class="headerlink" title="2. 安装hexo 安装hexo-deployer插件"></a>2. 安装hexo 安装hexo-deployer插件</h4><p>   <code>sudo npm install -g hexo-cli</code>    </p>
-<p>​    安装过程有错误很警告, 暂时不管,  使用hexo -v 查看是否安装成功</p>
-<p>   <code>npm install hexo-deployer-git —save</code></p>
-<h3 id="第二部分-建站"><a href="#第二部分-建站" class="headerlink" title="第二部分: 建站"></a>第二部分: 建站</h3><h4 id="1-初始化Hexo-建立一个网站-Hexo将会在指定文件夹中生成所需要的文件"><a href="#1-初始化Hexo-建立一个网站-Hexo将会在指定文件夹中生成所需要的文件" class="headerlink" title="1. 初始化Hexo 建立一个网站, Hexo将会在指定文件夹中生成所需要的文件"></a>1. 初始化Hexo 建立一个网站, Hexo将会在指定文件夹中生成所需要的文件</h4>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">hexo init &lt;folder&gt;  </span><br><span class="line"></span><br><span class="line">cd &lt;folder&gt;</span><br><span class="line"></span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
-
-<p>   初始化成功后,文件夹会生成相关文件</p>
-<p>   _config.yml: 网站的配置信息</p>
-<p>   node_modules: 依赖包</p>
-<p>   public：存放生成的页面</p>
-<p>   scaffolds：生成文章的一些模板, 当您新建文章时，Hexo 会根据 scaffold 来建立文件</p>
-<p>   source：用来存放你的文章以及资源</p>
-<p>   themes：主题,Hexo 会根据主题来生成静态页面</p>
-<h4 id="2-打开Hexo服务"><a href="#2-打开Hexo服务" class="headerlink" title="2. 打开Hexo服务"></a>2. 打开Hexo服务</h4><p>​    <code>hero s</code> 或者 <code>hexo server</code></p>
-<p>   浏览器打开localhost:4000就可以看到生成的博客</p>
-<h3 id="第三部分-托管到github上"><a href="#第三部分-托管到github上" class="headerlink" title="第三部分: 托管到github上"></a>第三部分: 托管到github上</h3><h4 id="1-github新建一个public仓库"><a href="#1-github新建一个public仓库" class="headerlink" title="1.github新建一个public仓库"></a>1.github新建一个public仓库</h4><h4 id="2-生成SSH添加到GitHub"><a href="#2-生成SSH添加到GitHub" class="headerlink" title="2.生成SSH添加到GitHub"></a>2.生成SSH添加到GitHub</h4>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name &quot;yourname&quot;</span><br><span class="line">git config --global user.email &quot;youremail&quot;</span><br><span class="line">ssh-keygen -t rsa -C &quot;youremail@com&quot;</span><br></pre></td></tr></table></figure>
-
-<p>   设置SSH密码</p>
-<h4 id="3-配置config-yml文件"><a href="#3-配置config-yml文件" class="headerlink" title="3.配置config.yml文件"></a>3.配置config.yml文件</h4><p>   修改_config.yml文件 配置你的网站</p>
-<p><img src="/2017/07/30/HexoCreate/hexoConfig1.png" alt> </p>
-<p><img src="/2017/07/30/HexoCreate/hexoConfig2.png" alt></p>
-<p>其他命令:</p>
-<p>hexo new [layout] <title>  新建一篇文章</title></p>
-<p>hexo new “post title with whitespace”  会在sourse下生成一个md文件,  可以对此文件进行编辑</p>
-<p>hexo generate 生成静态文件</p>
-<p>hexo publish [layout] <filename> 发表草稿</filename></p>
-<p>hexo deploy 部署网站</p>
-<p>hexo clean 清除缓存文件和已生成的静态文件</p>
-<p>其他详细内容参考<a href="https://hexo.io/zh-cn/docs/commands" target="_blank" rel="noopener">https://hexo.io/zh-cn/docs/commands</a></p>
-<h4 id="4-提交代码到github"><a href="#4-提交代码到github" class="headerlink" title="4.提交代码到github"></a>4.提交代码到github</h4>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean  清除缓存</span><br><span class="line">hexo g   这一步是生成静态页面</span><br><span class="line">hexo d   这个是部署到git上,提交代码到github</span><br></pre></td></tr></table></figure>
-
-<h3 id="第四部分-绑定域名"><a href="#第四部分-绑定域名" class="headerlink" title="第四部分: 绑定域名"></a>第四部分: 绑定域名</h3><ol>
-<li><p>申请域名, 阿里云 腾讯云。 如果需要申请服务器 需要备案</p>
-</li>
-<li><p>解析域名</p>
-<p><img src="/2017/07/30/HexoCreate/hexoConfig3.png" alt></p>
-</li>
-<li><p>在博客目录下天CNAME 。 输入域名, 提交代码到github , 等10分钟,  通过<a href="https://www.域名.com访问" target="_blank" rel="noopener">https://www.域名.com访问</a></p>
-</li>
-</ol>
-<h4 id="主题设置http-theme-next-iissnan-com"><a href="#主题设置http-theme-next-iissnan-com" class="headerlink" title="主题设置http://theme-next.iissnan.com/"></a>主题设置<a href="http://theme-next.iissnan.com/" target="_blank" rel="noopener">http://theme-next.iissnan.com/</a></h4>
-          
+          <p>Hexo是一款基于Node.js的静态博客框架,  可以在github page平台上托管我们的博客</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/07/30/HexoCreate/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>

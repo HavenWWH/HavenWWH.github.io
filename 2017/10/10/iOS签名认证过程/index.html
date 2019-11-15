@@ -79,19 +79,19 @@
 
 
 
-<meta name="description" content="keychain里的“从证书颁发机构请求证书”，Mac上生成一对公私钥, CertificateSigningRequest(公钥L) , Mac上还有一份私钥L存在本地 苹果后台一个私钥A     iOS设备一个公钥A CertificateSigningRequest(公钥L)上传到开发者账号关联App生成证书, 这个过程苹果后台私钥A与公钥L进行签名, 下载证书到本地 生成pro描述文件,">
+<meta name="description" content="keychain里的“从证书颁发机构请求证书”，Mac上生成一对公私钥, CertificateSigningRequest(公钥L) , Mac上还有一份私钥L存在本地">
 <meta name="keywords" content="iOS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS签名认证过程">
 <meta property="og:url" content="https://HavenWWH.github.io/2017/10/10/iOS签名认证过程/index.html">
 <meta property="og:site_name" content="Haven的博客">
-<meta property="og:description" content="keychain里的“从证书颁发机构请求证书”，Mac上生成一对公私钥, CertificateSigningRequest(公钥L) , Mac上还有一份私钥L存在本地 苹果后台一个私钥A     iOS设备一个公钥A CertificateSigningRequest(公钥L)上传到开发者账号关联App生成证书, 这个过程苹果后台私钥A与公钥L进行签名, 下载证书到本地 生成pro描述文件,">
+<meta property="og:description" content="keychain里的“从证书颁发机构请求证书”，Mac上生成一对公私钥, CertificateSigningRequest(公钥L) , Mac上还有一份私钥L存在本地">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://havenwwh.github.io/2017/10/10/iOS签名认证过程/iosp12.jpeg">
-<meta property="og:updated_time" content="2019-11-01T08:50:14.777Z">
+<meta property="og:updated_time" content="2019-11-15T09:46:11.081Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS签名认证过程">
-<meta name="twitter:description" content="keychain里的“从证书颁发机构请求证书”，Mac上生成一对公私钥, CertificateSigningRequest(公钥L) , Mac上还有一份私钥L存在本地 苹果后台一个私钥A     iOS设备一个公钥A CertificateSigningRequest(公钥L)上传到开发者账号关联App生成证书, 这个过程苹果后台私钥A与公钥L进行签名, 下载证书到本地 生成pro描述文件,">
+<meta name="twitter:description" content="keychain里的“从证书颁发机构请求证书”，Mac上生成一对公私钥, CertificateSigningRequest(公钥L) , Mac上还有一份私钥L存在本地">
 <meta name="twitter:image" content="https://havenwwh.github.io/2017/10/10/iOS签名认证过程/iosp12.jpeg">
 
 
@@ -333,12 +333,19 @@
 
       
         <ol>
-<li>keychain里的“从证书颁发机构请求证书”，Mac上生成一对公私钥, CertificateSigningRequest(公钥L) , Mac上还有一份私钥L存在本地</li>
-<li>苹果后台一个私钥A     iOS设备一个公钥A</li>
-<li>CertificateSigningRequest(公钥L)上传到开发者账号关联App生成证书, 这个过程苹果后台私钥A与公钥L进行签名, 下载证书到本地</li>
-<li>生成pro描述文件, (APPID,  设备ID, 上一步的证书用私钥A去签名),下载到本地Mac</li>
-<li>编译App时, 用本地私钥L对App进行签名,  和描述文件(provisioning)一起打包安装到手机上</li>
-<li>安装时, 公钥A对描述文件进行验证, 再里面的签名证书(第三步生成的证书)</li>
+<li><p>keychain里的“从证书颁发机构请求证书”，Mac上生成一对公私钥, CertificateSigningRequest(公钥L) , Mac上还有一份私钥L存在本地</p>
+<a id="more"></a>
+</li>
+<li><p>苹果后台一个私钥A     iOS设备一个公钥A</p>
+</li>
+<li><p>CertificateSigningRequest(公钥L)上传到开发者账号关联App生成证书, 这个过程苹果后台私钥A与公钥L进行签名, 下载证书到本地</p>
+</li>
+<li><p>生成pro描述文件, (APPID,  设备ID, 上一步的证书用私钥A去签名),下载到本地Mac</p>
+</li>
+<li><p>编译App时, 用本地私钥L对App进行签名,  和描述文件(provisioning)一起打包安装到手机上</p>
+</li>
+<li><p>安装时, 公钥A对描述文件进行验证, 再里面的签名证书(第三步生成的证书)</p>
+</li>
 </ol>
 <p><img src="/2017/10/10/iOS签名认证过程/iosp12.jpeg" alt></p>
 <h3 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h3><h5 id="从AppStore下载App"><a href="#从AppStore下载App" class="headerlink" title="从AppStore下载App"></a>从AppStore下载App</h5><p>上传App到AppStore的时候, 苹果后台用私钥对App进行签名, 手机下载后, 手机公钥会验证签名, 通过则可以安装到手机上</p>
