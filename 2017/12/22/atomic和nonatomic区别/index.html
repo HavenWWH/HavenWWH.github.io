@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="removeFromSuperview苹果官方文档说明: 从当前视图的父视图和窗口中移除,同时从响应事件的响应者链中移除">
+<meta name="description" content="atomic和nonatomic区别nonatomic：非原子的atomic：原子的定义 property的时候, 默认是原子的atomic, atomic和nonatomic区别如下, atomic只能说是线程安全的, 不能保证一定安全, 为什么呢? 先看看两者的区别 两者最本质的区别就是系统自动生产getter/setter方法不同  atomic内部getter/setter方法 12345">
 <meta name="keywords" content="iOS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="removeFromSuperview详解">
-<meta property="og:url" content="https://HavenWWH.github.io/2017/09/01/removeFromSuperview详解/index.html">
+<meta property="og:title" content="atomic和nonatomic区别">
+<meta property="og:url" content="https://HavenWWH.github.io/2017/12/22/atomic和nonatomic区别/index.html">
 <meta property="og:site_name" content="Haven的博客">
-<meta property="og:description" content="removeFromSuperview苹果官方文档说明: 从当前视图的父视图和窗口中移除,同时从响应事件的响应者链中移除">
+<meta property="og:description" content="atomic和nonatomic区别nonatomic：非原子的atomic：原子的定义 property的时候, 默认是原子的atomic, atomic和nonatomic区别如下, atomic只能说是线程安全的, 不能保证一定安全, 为什么呢? 先看看两者的区别 两者最本质的区别就是系统自动生产getter/setter方法不同  atomic内部getter/setter方法 12345">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-11-15T09:46:43.306Z">
+<meta property="og:updated_time" content="2019-12-06T02:48:38.101Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="removeFromSuperview详解">
-<meta name="twitter:description" content="removeFromSuperview苹果官方文档说明: 从当前视图的父视图和窗口中移除,同时从响应事件的响应者链中移除">
+<meta name="twitter:title" content="atomic和nonatomic区别">
+<meta name="twitter:description" content="atomic和nonatomic区别nonatomic：非原子的atomic：原子的定义 property的时候, 默认是原子的atomic, atomic和nonatomic区别如下, atomic只能说是线程安全的, 不能保证一定安全, 为什么呢? 先看看两者的区别 两者最本质的区别就是系统自动生产getter/setter方法不同  atomic内部getter/setter方法 12345">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://HavenWWH.github.io/2017/09/01/removeFromSuperview详解/">
+  <link rel="canonical" href="https://HavenWWH.github.io/2017/12/22/atomic和nonatomic区别/">
 
 
 
 
 
-  <title>removeFromSuperview详解 | Haven的博客</title>
+  <title>atomic和nonatomic区别 | Haven的博客</title>
   
 
 
@@ -263,7 +263,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/09/01/removeFromSuperview详解/">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/12/22/atomic和nonatomic区别/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Haven">
@@ -280,7 +280,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">removeFromSuperview详解</h1>
+          <h1 class="post-title" itemprop="name headline">atomic和nonatomic区别</h1>
         
 
         <div class="post-meta">
@@ -292,8 +292,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-01T11:04:01+08:00">
-                2017-09-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-22T08:10:05+08:00">
+                2017-12-22
               </time>
             
 
@@ -330,21 +330,31 @@
       
 
       
-        <h4 id="removeFromSuperview"><a href="#removeFromSuperview" class="headerlink" title="removeFromSuperview"></a>removeFromSuperview</h4><p>苹果官方文档说明: 从当前视图的父视图和窗口中移除,同时从响应事件的响应者链中移除</p>
-<a id="more"></a>
+        <h3 id="atomic和nonatomic区别"><a href="#atomic和nonatomic区别" class="headerlink" title="atomic和nonatomic区别"></a>atomic和nonatomic区别</h3><h5 id="nonatomic：非原子的"><a href="#nonatomic：非原子的" class="headerlink" title="nonatomic：非原子的"></a>nonatomic：非原子的</h5><h5 id="atomic：原子的"><a href="#atomic：原子的" class="headerlink" title="atomic：原子的"></a>atomic：原子的</h5><p>定义 property的时候, 默认是原子的atomic, atomic和nonatomic区别如下, atomic只能说是线程安全的, 不能保证一定安全, 为什么呢? 先看看两者的区别</p>
+<p>两者最本质的区别就是系统自动生产getter/setter方法不同</p>
+<ul>
+<li><p>atomic内部getter/setter方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">- (void)setName:(NSString *)name &#123;</span><br><span class="line"></span><br><span class="line">    @synchronized(self) &#123;</span><br><span class="line">        if (_name != name) &#123;</span><br><span class="line">            [_name release];</span><br><span class="line">            _name = [name retain];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (NSString *)name &#123;</span><br><span class="line"></span><br><span class="line">    @synchronized(self) &#123;</span><br><span class="line">        return _name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>nonatomic内部getter/setter方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- (void)setName:(NSString *)name &#123;</span><br><span class="line"></span><br><span class="line">    if (_name != name) &#123;</span><br><span class="line">        [_name release];</span><br><span class="line">        _name = [name retain];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (NSString *)name &#123;</span><br><span class="line"></span><br><span class="line">    return _name;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>此方法做两件事情:</p>
+</li>
+</ul>
+<p>atomic的getter/setter方法内部加了一个锁,因为这个锁,所以nonatomic执行效率高,   如果有多个线程进行setter方法的时候,此时就能保证线程安全, 其实准确的讲应该是读/写线程安全, 因为此时如果有个线程不是执行setter方法,只是执行[_name release], 那么就不是线程安全了, 那么就可能crash</p>
+<h5 id="总结区别-atomic和nonatomic区别"><a href="#总结区别-atomic和nonatomic区别" class="headerlink" title="总结区别: atomic和nonatomic区别"></a>总结区别: atomic和nonatomic区别</h5><ul>
+<li>atomic</li>
+</ul>
 <ol>
-<li><p>在树形结构中找到该节点，从树型数据结构中删除该节点及其子节点</p>
-</li>
-<li><p>把该对象从响应者链中移除</p>
-</li>
+<li>保证访问这个属性时线程安全</li>
+<li>速度慢</li>
 </ol>
-<p>注意⚠️: </p>
+<ul>
+<li>nonatomic</li>
+</ul>
 <ol>
-<li>执行此方法后,会将当前视图视图从它的父视图中移除, 将父视图对它的强引用删除, 如果不存在其他强引用, 则当前视图会自动从内存中释放, 如果还存在其他强引用则不释放</li>
-<li>可以通过设置nil 从内存中移除</li>
-<li>多次执行removeFromSuperview不会报错</li>
+<li>线程不安全</li>
+<li>速度快</li>
 </ol>
 
       
@@ -376,8 +386,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/08/18/iOS响应链之事件传递和响应/" rel="next" title="iOS响应链之事件传递和响应">
-                <i class="fa fa-chevron-left"></i> iOS响应链之事件传递和响应
+              <a href="/2017/12/15/copy和mutableCopy也就这样/" rel="next" title="copy和mutableCopy也就这样">
+                <i class="fa fa-chevron-left"></i> copy和mutableCopy也就这样
               </a>
             
           </div>
@@ -386,8 +396,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/10/10/iOS签名认证过程/" rel="prev" title="iOS签名认证过程">
-                iOS签名认证过程 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/05/30/本地私有库创建与使用/" rel="prev" title="本地私有库创建与使用">
+                本地私有库创建与使用 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -513,7 +523,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#removeFromSuperview"><span class="nav-number">1.</span> <span class="nav-text">removeFromSuperview</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#atomic和nonatomic区别"><span class="nav-number">1.</span> <span class="nav-text">atomic和nonatomic区别</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#nonatomic：非原子的"><span class="nav-number">1.0.1.</span> <span class="nav-text">nonatomic：非原子的</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#atomic：原子的"><span class="nav-number">1.0.2.</span> <span class="nav-text">atomic：原子的</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#总结区别-atomic和nonatomic区别"><span class="nav-number">1.0.3.</span> <span class="nav-text">总结区别: atomic和nonatomic区别</span></a></li></ol></li></ol></div>
             
 
           </div>
