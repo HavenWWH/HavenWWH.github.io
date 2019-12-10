@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="iOS,">
+  <meta name="keywords" content="数据结构,">
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="苹果手机尺寸相关知识">
-<meta name="keywords" content="iOS">
+<meta name="description" content="哈希表(Hash)哈希表,也叫散列表,是一种数据结构, 可以通过极快的速度查询, 插入, 删除需要的元素, 只是无法查找最大值, 最小值,排序等操作根据关键码值(Key value)而直接进行访问的数据结构。也就是说，它通过把关键码值映射到表中一个位置来访问记录，以加快查找的速度。这个映射函数叫做散列函数，存放记录的数组叫做散列表给定表M，存在函数f(key)，对任意给定的关键字值key，代入函">
+<meta name="keywords" content="数据结构">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS适配方案">
-<meta property="og:url" content="https://HavenWWH.github.io/2017/08/10/iOS适配方案/index.html">
+<meta property="og:title" content="哈希表">
+<meta property="og:url" content="https://HavenWWH.github.io/2017/12/29/哈希表/index.html">
 <meta property="og:site_name" content="Haven的博客">
-<meta property="og:description" content="苹果手机尺寸相关知识">
+<meta property="og:description" content="哈希表(Hash)哈希表,也叫散列表,是一种数据结构, 可以通过极快的速度查询, 插入, 删除需要的元素, 只是无法查找最大值, 最小值,排序等操作根据关键码值(Key value)而直接进行访问的数据结构。也就是说，它通过把关键码值映射到表中一个位置来访问记录，以加快查找的速度。这个映射函数叫做散列函数，存放记录的数组叫做散列表给定表M，存在函数f(key)，对任意给定的关键字值key，代入函">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-11-15T09:46:18.919Z">
+<meta property="og:updated_time" content="2019-12-06T10:02:52.071Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS适配方案">
-<meta name="twitter:description" content="苹果手机尺寸相关知识">
+<meta name="twitter:title" content="哈希表">
+<meta name="twitter:description" content="哈希表(Hash)哈希表,也叫散列表,是一种数据结构, 可以通过极快的速度查询, 插入, 删除需要的元素, 只是无法查找最大值, 最小值,排序等操作根据关键码值(Key value)而直接进行访问的数据结构。也就是说，它通过把关键码值映射到表中一个位置来访问记录，以加快查找的速度。这个映射函数叫做散列函数，存放记录的数组叫做散列表给定表M，存在函数f(key)，对任意给定的关键字值key，代入函">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://HavenWWH.github.io/2017/08/10/iOS适配方案/">
+  <link rel="canonical" href="https://HavenWWH.github.io/2017/12/29/哈希表/">
 
 
 
 
 
-  <title>iOS适配方案 | Haven的博客</title>
+  <title>哈希表 | Haven的博客</title>
   
 
 
@@ -263,7 +263,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/08/10/iOS适配方案/">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/12/29/哈希表/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Haven">
@@ -280,7 +280,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">iOS适配方案</h1>
+          <h1 class="post-title" itemprop="name headline">哈希表</h1>
         
 
         <div class="post-meta">
@@ -292,8 +292,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-10T19:43:05+08:00">
-                2017-08-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-29T18:10:05+08:00">
+                2017-12-29
               </time>
             
 
@@ -330,146 +330,48 @@
       
 
       
-        <p>苹果手机尺寸相关知识</p>
+        <ol>
+<li><h3 id="哈希表-Hash"><a href="#哈希表-Hash" class="headerlink" title="哈希表(Hash)"></a>哈希表(Hash)</h3><p>哈希表,也叫散列表,是一种数据结构, 可以通过极快的速度查询, 插入, 删除需要的元素, 只是无法查找最大值, 最小值,排序等操作<br>根据关键码值(Key value)而直接进行访问的数据结构。也就是说，它通过把关键码值映射到表中一个位置来访问记录，以加快查找的速度。这个映射函数叫做散列函数，存放记录的数组叫做散列表<br>给定表M，存在函数f(key)，对任意给定的关键字值key，代入函数后若能得到包含该关键字的记录在表中的地址，则称表M为哈希(Hash）表，函数f(key)为哈希(Hash) 函数</p>
+<p>根据关键字和哈希函数就能确定在哈希表对应的位置, 所以确定哈希函数非常关键</p>
+<p>装载因子是指所有关键子填充哈希表后饱和的程度，它等于 关键字总数/哈希表的长度  </p>
 <a id="more"></a>
 
-<table>
-<thead>
-<tr>
-<th align="left">机型</th>
-<th align="left">分辨率</th>
-<th align="center">开发尺寸/物理尺寸</th>
-<th align="center">倍数</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">iPhone 11 Pro Max</td>
-<td align="left">1242x2688</td>
-<td align="center">414x896</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone 11 Pro</td>
-<td align="left">1125x2436</td>
-<td align="center">375x812</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone 11</td>
-<td align="left">828x1792</td>
-<td align="center">414x896</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPhone XS Max</td>
-<td align="left">1242x2688</td>
-<td align="center">414x896</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone XS</td>
-<td align="left">1125x2436</td>
-<td align="center">375x812</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone XR</td>
-<td align="left">828x1792</td>
-<td align="center">414x896</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPhone X</td>
-<td align="left">1125x2436</td>
-<td align="center">375x812</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone 6/6s/7/8</td>
-<td align="left">750x1334</td>
-<td align="center">375x667</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPhone 6 Plus/6s Plus/7 Plus/8 Plus</td>
-<td align="left">1242x2208</td>
-<td align="center">414x736</td>
-<td align="center">@3x</td>
-</tr>
-<tr>
-<td align="left">iPhone SE / 5C /5s / 5</td>
-<td align="left">640x1136</td>
-<td align="center">320x568</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPhone 4/4S</td>
-<td align="left">640x960</td>
-<td align="center">320x480</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPhone 3GS</td>
-<td align="left">320x480</td>
-<td align="center">320x480</td>
-<td align="center">@1x</td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="left"></td>
-<td align="center"></td>
-<td align="center"></td>
-</tr>
-<tr>
-<td align="left">iPad 7.9</td>
-<td align="left">1536x2048</td>
-<td align="center">768x1024</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPad 9.7</td>
-<td align="left">1536x2048</td>
-<td align="center">768x1024</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPad 10.2</td>
-<td align="left">1620x2160</td>
-<td align="center">810x1080</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPad 10.5</td>
-<td align="left">1668x2224</td>
-<td align="center">834x1112</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPad 11.0</td>
-<td align="left">1668x2388</td>
-<td align="center">834x1194</td>
-<td align="center">@2x</td>
-</tr>
-<tr>
-<td align="left">iPad 12.9</td>
-<td align="left">2048x2732</td>
-<td align="center">1024x1366</td>
-<td align="center">@2x</td>
-</tr>
-</tbody></table>
-<h5 id="适配方案-拉伸适配"><a href="#适配方案-拉伸适配" class="headerlink" title="适配方案:拉伸适配"></a>适配方案:拉伸适配</h5><p>designW : 设计稿的宽   iphone6为标准, 则设计稿的宽为375, 以6p为标准, 则设计稿的宽为414</p>
-<p>designH : 设计稿的高</p>
-<p>deviceW : 设备的宽</p>
-<p>deviceH : 设备的高</p>
-<p>dw : 设计稿中某个控件的位置</p>
-<p>vw : 最终在实际的设备中的位置</p>
-<p>如果我们以宽适配, 将设计稿的宽拉伸或者缩小到设备的宽, 拉伸或者缩小到比例(x)就是<strong>deviceW / designW</strong>, 设备宽度除以设计稿宽度</p>
-<p><strong>deviceW / designW = vw / dw</strong>   </p>
-<p><strong>vw = dw * deviceW / designW</strong> </p>
-<p>例如: 设计稿是以6为标准, 那么设计稿的宽designW = 375,  设备宽为deviceW = MIN([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)  设计稿中控件的宽dw = 100, 那么最终实际设备中的宽vw = [UIScreen mainScreen].bounds.size.width / 375 * 100</p>
-<p>如果我们以高适配, 将设计稿的高拉伸或者缩小到设备的宽, 拉伸或者缩小到比例(x)就是<strong>deviceH / designH</strong>, 设备高度除以设计稿高度</p>
-<p><strong>deviceH / designH = vw / dw</strong>   </p>
-<p><strong>vw = dw * deviceH / designH</strong> </p>
+<ul>
+<li><h5 id="哈希值"><a href="#哈希值" class="headerlink" title="哈希值"></a>哈希值</h5><p>  哈希值是一个int的整型值, 哈希地址</p>
+</li>
+<li><h5 id="哈希函数的构造方法"><a href="#哈希函数的构造方法" class="headerlink" title="哈希函数的构造方法"></a>哈希函数的构造方法</h5><p>  确定以什么样的值作为哈希地址的方法</p>
+<ol>
+<li>直接定址法</li>
+<li>数字分析法</li>
+<li>平方取中法</li>
+<li>折叠法</li>
+<li>除留取余法</li>
+<li>随机数法</li>
+</ol>
+</li>
+<li><h5 id="哈希表大小的确定"><a href="#哈希表大小的确定" class="headerlink" title="哈希表大小的确定"></a>哈希表大小的确定</h5><p>哈希表如果存储空间远远大于需要存储的数量, 则会造成大量的空间浪费, 如果存储空间太小, 则会存在很多冲突</p>
+</li>
+<li><h5 id="哈希表冲突"><a href="#哈希表冲突" class="headerlink" title="哈希表冲突"></a>哈希表冲突</h5><p>哈希表冲突是指同一个关键字产生相同的地址, 这种情况在哈希表中是必然存在的<br>哈希表的冲突既然是无法避免的, 怎么解决冲突呢?</p>
+</li>
+</ul>
+<ol>
+<li><p>开放定址法<br>Hi=(H(key)+di) MOD m i=1,2,…,k(k&lt;=m-1)<br>其中m为表长，di为增量序列</p>
+<ul>
+<li>线性探测法<br>di值可能为1,2,3,…m-1</li>
+<li>二次探测法<br>di取值可能为1,-1,2,-2,4,-4,9,-9,16,-16,…k<em>k,-k</em>k(k&lt;=m/2)</li>
+<li>伪随机探测法<br>di取值可能为伪随机数列</li>
+</ul>
+</li>
+<li><p>链地址法,也叫拉链法<br>产生hash冲突后在存储数据后面加一个指针，指向后面冲突的数据</p>
+</li>
+</ol>
+<ul>
+<li><h5 id="hash表的查找"><a href="#hash表的查找" class="headerlink" title="hash表的查找"></a>hash表的查找</h5><p>  查找过程和造表过程一致，假设采用开放定址法处理冲突，则查找过程为：<br>  对于给定的key，计算hash地址index = H（key）<br>  如果数组arr【index】的值为空 则查找不成功<br>  如果数组arr【index】== key 则查找成功<br>  否则 使用冲突解决方法求下一个地址，直到arr【index】== key或者 arr【index】==null</p>
+<p>  <a href="https://www.cnblogs.com/lchzls/p/6714079.html" target="_blank" rel="noopener">参考链接</a></p>
+</li>
+</ul>
+</li>
+</ol>
 
       
     </div>
@@ -487,7 +389,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/iOS/" rel="tag"># iOS</a>
+            <a href="/tags/数据结构/" rel="tag"># 数据结构</a>
           
         </div>
       
@@ -500,8 +402,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/30/HexoCreate/" rel="next" title="Hexo搭建">
-                <i class="fa fa-chevron-left"></i> Hexo搭建
+              <a href="/2017/12/22/atomic和nonatomic区别/" rel="next" title="atomic和nonatomic区别">
+                <i class="fa fa-chevron-left"></i> atomic和nonatomic区别
               </a>
             
           </div>
@@ -510,8 +412,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/08/18/iOS响应链之事件传递和响应/" rel="prev" title="iOS响应链之事件传递和响应">
-                iOS响应链之事件传递和响应 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/01/05/weak理解/" rel="prev" title="weak理解">
+                weak理解 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -637,7 +539,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#适配方案-拉伸适配"><span class="nav-number">1.</span> <span class="nav-text">适配方案:拉伸适配</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#哈希表-Hash"><span class="nav-number">1.</span> <span class="nav-text">哈希表(Hash)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#哈希值"><span class="nav-number">1.0.1.</span> <span class="nav-text">哈希值</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#哈希函数的构造方法"><span class="nav-number">1.0.2.</span> <span class="nav-text">哈希函数的构造方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#哈希表大小的确定"><span class="nav-number">1.0.3.</span> <span class="nav-text">哈希表大小的确定</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#哈希表冲突"><span class="nav-number">1.0.4.</span> <span class="nav-text">哈希表冲突</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#hash表的查找"><span class="nav-number">1.0.5.</span> <span class="nav-text">hash表的查找</span></a></li></ol></li></ol></div>
             
 
           </div>
