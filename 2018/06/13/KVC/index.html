@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="KVC的本质全名Key Value Coding, 一种访问属性方法或成员变量的机制，通过字符串来访问属性方法或成员变量">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KVC">
+<meta property="og:url" content="https://HavenWWH.github.io/2018/06/13/KVC/index.html">
+<meta property="og:site_name" content="Haven的博客">
+<meta property="og:description" content="KVC的本质全名Key Value Coding, 一种访问属性方法或成员变量的机制，通过字符串来访问属性方法或成员变量">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-12-13T11:36:22.314Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="KVC">
+<meta name="twitter:description" content="KVC的本质全名Key Value Coding, 一种访问属性方法或成员变量的机制，通过字符串来访问属性方法或成员变量">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://HavenWWH.github.io/2018/06/13/KVC/">
+
+
+
+
+
+  <title>KVC | Haven的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Haven的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/06/13/KVC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Haven">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haven的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">KVC</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-13T10:40:05+08:00">
+                2018-06-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="KVC的本质"><a href="#KVC的本质" class="headerlink" title="KVC的本质"></a>KVC的本质</h3><p>全名Key Value Coding, 一种访问属性方法或成员变量的机制，通过字符串来访问属性方法或成员变量 </p>
+<a id="more"></a> 
+<p>基本方法:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 通过Key来取值</span><br><span class="line">- (nullableid)valueForKey:(NSString*)key;</span><br><span class="line">// 通过Key来设置值</span><br><span class="line">- (void)setValue:(nullableid)value forKey:(NSString*)key;</span><br><span class="line">// 通过KeyPath来取值</span><br><span class="line">- (nullableid)valueForKeyPath:(NSString*)keyPath;</span><br><span class="line">//通过KeyPath来设置值</span><br><span class="line">- (void)setValue:(nullableid)value forKeyPath:(NSString*)keyPath;</span><br></pre></td></tr></table></figure>
+
+<p>key跟keyPath的区别:<br>keyPath能设置更深层次的属性方法或者成员变量, 例如Peroson.student.name, Person类中student对象属性的name属性</p>
+<h4 id="setValue-forKey-实现原理"><a href="#setValue-forKey-实现原理" class="headerlink" title="setValue:forKey: 实现原理"></a>setValue:forKey: 实现原理</h4><p>例子说明: 创建一个Model(KVCTestModel), 在.m里面实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">@interface KVCTestModel() &#123;</span><br><span class="line">    </span><br><span class="line">    NSString *_name;</span><br><span class="line">    NSString *_isName;</span><br><span class="line">    NSString *name;</span><br><span class="line">    NSString *isName;</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">// 是否想让外界访问实例变量, false则不允许, true则允许通过_key，_iskey，key，iskey顺序去搜索变量</span><br><span class="line">+ (BOOL)accessInstanceVariablesDirectly &#123;</span><br><span class="line">    </span><br><span class="line">    NSLog(@&quot;accessInstanceVariablesDirectly&quot;);</span><br><span class="line">    return true;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)setName:(NSString *)name &#123;</span><br><span class="line"></span><br><span class="line">    NSLog(@&quot;setName&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)_setName:(NSString *)name &#123;</span><br><span class="line"></span><br><span class="line">    NSLog(@&quot;_setName&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)setIsName:(NSString *)name &#123;</span><br><span class="line"></span><br><span class="line">     NSLog(@&quot;setIsName&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 重写此方法, 处理异常情况, 让程序不crash</span><br><span class="line">- (void)setValue:(id)value forUndefinedKey:(NSString *)key &#123;</span><br><span class="line">    </span><br><span class="line">    NSLog(@&quot;setValue:(id)value forUndefinedKey:(NSString *)key&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用setValue:forKey:<br>依次注释执行setName/_setName/setIsName,  判断三个方法的优先级</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">KVCTestModel *testModel = [[KVCTestModel alloc] init];</span><br><span class="line">[testModel setValue:@&quot;1111&quot; forKey:@&quot;name&quot;];</span><br></pre></td></tr></table></figure>
+
+<p>结果说明:  </p>
+<ol>
+<li>实现了setName/_setName/setIsName方法中的任意一个, accessInstanceVariablesDirectly方法都不会执行, setName/_setName/setIsName只会执行其中一个且优先级setName &gt; _setName &gt; setIsName</li>
+<li>如果setName/_setName/setIsName都没有实现,  则会执行accessInstanceVariablesDirectly方法,且返回true,则会查找命名规则为_name、_isName、name、isName的实例变量, 且优先级_name &gt; _isName &gt; name &gt; isName,根据这个顺序将value赋值给实例变量</li>
+<li>如果没有搜索到对应的key或者keyPath，则会调用对应的异常方法- (void)setValue:(id)value forUndefinedKey:(NSString *)key, 如果没有重写此方法则会crash, 提示找不到key或keyPath, 可以通过重写此方法进行异常处理</li>
+</ol>
+<p>注意:  </p>
+<ol>
+<li>遇到不支持nil的数据类型时，比如说BOOL, Int数据时，那么还得实现接收对象的setNilValueForKey:方法, 否则直接进行设置会crash, 提示could not set nil as the value for the key</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- (void)setNilValueForKey:(NSString *)theKey &#123;</span><br><span class="line">    // hidden是Bool型  直接复制会有问题</span><br><span class="line">    if ([theKey isEqualToString:@&quot;hidden&quot;]) &#123;</span><br><span class="line">        [self setValue:@YES forKey:@&quot;hidden&quot;];</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        [super setNilValueForKey:theKey];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>KVC属性验证,判断键值的正确性 在设置值的时候进行一些操作, 判断是否需要继续设置, 默认不实现, 需要手动实现</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 在类内部实现此方法</span><br><span class="line">-(BOOL)validateName:(id *)ioValue error:(NSError * __autoreleasing *)outError &#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 在外部手动调用, 进行判断</span><br><span class="line">KVCTestModel *testModel = [[KVCTestModel alloc] init];</span><br><span class="line">[testModel setValue:@&quot;1111&quot; forKey:@&quot;name&quot;];</span><br><span class="line">NSError *error;</span><br><span class="line">NSString *name = @&quot;2222&quot;;</span><br><span class="line">if (![testModel validateValue:&amp;name forKey:@&quot;name&quot;error:&amp;error]) &#123;</span><br><span class="line">        </span><br><span class="line">    NSLog(@&quot;%@&quot;, error);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="valueForKey-实现原理"><a href="#valueForKey-实现原理" class="headerlink" title="valueForKey: 实现原理"></a>valueForKey: 实现原理</h4><p>例子:  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">- (id)getName &#123;</span><br><span class="line"></span><br><span class="line">    NSLog(@&quot;getName&quot;);</span><br><span class="line">    return @&quot;getName&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (id)name &#123;</span><br><span class="line">    </span><br><span class="line">    NSLog(@&quot;name&quot;);</span><br><span class="line">    return @&quot;name&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (id)isName &#123;</span><br><span class="line">    </span><br><span class="line">    NSLog(@&quot;isName&quot;);</span><br><span class="line">    return @&quot;isName&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (id)valueForUndefinedKey:(NSString *)key &#123;</span><br><span class="line">    </span><br><span class="line">    NSLog(@&quot;valueForUndefinedKey&quot;);</span><br><span class="line">    return @&quot;没取到&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用valueForKey:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[testModel valueForKey:@&quot;name&quot;];</span><br></pre></td></tr></table></figure>
+
+<p>结果说明:  </p>
+<ol>
+<li>实现了getName/name/isName, accessInstanceVariablesDirectly方法都不会执行, getName/name/isName只会执行一个且优先级getName &gt; name &gt; isName</li>
+<li>如果getName/name/isName都没有实现,  则会执行accessInstanceVariablesDirectly方法,且返回true,则会查找命名规则为_name、_isName、name、isName的实例变量, 且优先级_name &gt; _isName &gt; name &gt; isName, 根据优先级取出value的值</li>
+<li>如果没有搜索到对应的key或者keyPath，则会调用对应的异常方法- (nullable id)valueForUndefinedKey:(NSString *)key, 如果没有重写此方法则会crash, 提示找不到key或keyPath, </li>
+</ol>
+<h4 id="mutableArrayValueForKey"><a href="#mutableArrayValueForKey" class="headerlink" title="mutableArrayValueForKey:"></a>mutableArrayValueForKey:</h4><p> 如果只是setValue或者valueForKey, 那么只是操作集合对象, 无法对集合内存储的元素进行操作, 怎么操作集合内的元素呢,在调用mutableArrayValueForKey方法时, 会返回一个NSKeyValueMutableArray可变代理数组, 可变代理数组可以响应NSMutableArray数组的所有方法,并且这个数组可以用来响应KVO</p>
+<h5 id="mutableArrayValueForKey-实现原理"><a href="#mutableArrayValueForKey-实现原理" class="headerlink" title="mutableArrayValueForKey:实现原理"></a>mutableArrayValueForKey:实现原理</h5><ol>
+<li>查找一对方法<br>insertObject:in<key>AtIndex:和removeObjectFrom<key>AtIndex:(相当于NSMutableArray的原始方法insertObject:atIndex:和removeObjectAtIndex:)或者方法名是insert<key>:atIndexes:和remove<key>AtIndexes:(相当于NSMutableArray的原始方法insertObjects:atIndexes:和removeObjectsAtIndexes:<br>如果至少找到一个insert方法,一个remove, 或者replaceObjectIn方法，那么返回一个可变代理数组, 来响应发送给NSMutableArray的组合消息insertObject:in<key>AtIndex:、removeObjectFrom<key>AtIndex:、insert<key>:atIndexes:，和remove<key>AtIndexes:消息<br>当对象接收一个mutableArrayValueForKey:消息并实现可选替换方法，例如replaceObjectIn<key>AtIndex:withObject:或replace<key>AtIndexes:with<key>:方法，代理对象会在适当的情况下使用它们，以获得最佳性能。</key></key></key></key></key></key></key></key></key></key></key></li>
+</ol>
+<ol start="2">
+<li><p>如果对象没有可变数组方法，查找一个替代方法，命名格式为set<key>:。在这种情况下，向mutableArrayValueForKey:的原始响应者发送一个set<key>:消息，来返回一个代理对象来响应NSMutableArray事件</key></key></p>
+</li>
+<li><p>如果没有可变数组的方法，也没有找到访问器，但接受响应的类accessInstanceVariablesDirectly属性返回YES，则查找一个名为_<key>或<key>的实例变量。按照这个顺序，如果找到实例变量，则返回一个代理对象。改对象将接收所有NSMutableArray发送过来的消息，通常是NSMutableArray或其子类。</key></key></p>
+</li>
+<li><p>如果所有情况都失败，则返回一个可变的集合代理对象。当它接收NSMutableArray消息时，发送一个setValue:forUndefinedKey:消息给接收mutableArrayValueForKey:消息的原始对象。这个setValue:forUndefinedKey:的默认实现是提出一个NSUndefinedKeyException异常，但是子类可以重写这个实现。</p>
+</li>
+</ol>
+<h5 id="KVC集合运算符的使用"><a href="#KVC集合运算符的使用" class="headerlink" title="KVC集合运算符的使用"></a>KVC集合运算符的使用</h5><p>valueForKeyPath:<br>集合运算符处理NSArray和NSSet及其子类这样的集合对象,<br>@avg // 算数平均值<br>@count // 计算总数<br>@max // 最大值<br>@min // 最小值<br>@sum // 求和, 求集合中某个值的总和<br>@unionOfObjects // 创建并返回一个数组，该数组包含与右键路径指定的属性对应的集合的所有对象。<br>@distinctUnionOfObjects // 同unionOfObjects，但会对数组去重<br>@unionOfArrays / 操作集合中到集合对象 创建并返回一个数组，该数组包含与右键路径指定的属性对应的所有集合的组合的对象。<br>@distinctUnionOfArrays // 同unionOfArrays，但会对数组去重  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">KVCTestModel *testModel1 = [[KVCTestModel alloc] init];</span><br><span class="line">testModel1.age = 10;</span><br><span class="line">KVCTestModel *testModel2 = [[KVCTestModel alloc] init];</span><br><span class="line">testModel2.age = 2;</span><br><span class="line">KVCTestModel *testModel3 = [[KVCTestModel alloc] init];</span><br><span class="line">testModel3.kName = @&quot;haven&quot;;</span><br><span class="line">    </span><br><span class="line">NSArray *arr1 = @[testModel1, testModel2, testModel3];</span><br><span class="line">NSArray *arr2= @[testModel1, testModel2, testModel3];</span><br><span class="line">NSArray *arr3 = @[arr1, arr2];</span><br><span class="line">NSNumber *avg = [arr1 valueForKeyPath:@&quot;@max.age&quot;];</span><br><span class="line">NSArray *tmpArr1 = [arr1 valueForKeyPath:@&quot;@unionOfObjects.kName&quot;];</span><br><span class="line">NSArray *tmpArr2 = [arr3 valueForKeyPath:@&quot;@unionOfArrays.age&quot;];</span><br><span class="line">NSLog(@&quot;\nage: %@ \ntmpArr1: %@ \ntmpArr2: %@&quot;, avg, tmpArr1, tmpArr2);</span><br></pre></td></tr></table></figure>
+
+<p>输出结果:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">2018-6-13 14:39:08.880535+0800 testKVC[98899:4111296]</span><br><span class="line">age: 10 </span><br><span class="line">tmpArr1: (</span><br><span class="line">    haven</span><br><span class="line">) </span><br><span class="line">tmpArr2: (</span><br><span class="line">    10,</span><br><span class="line">    2,</span><br><span class="line">    0,</span><br><span class="line">    10,</span><br><span class="line">    2,</span><br><span class="line">    0</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h5 id="KVC处理字典"><a href="#KVC处理字典" class="headerlink" title="KVC处理字典"></a>KVC处理字典</h5><p>KVC里关于字典的两个方法, 主要应用就是字典转模型,  模型转字典</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 指输入一组key，返回这组key对应的属性，再组成一个字典, 模型转字典</span><br><span class="line">- (NSDictionary&lt;NSString *, id&gt; *)dictionaryWithValuesForKeys:(NSArray&lt;NSString *&gt; *)keys;</span><br><span class="line">// 修改Model中对应key的属性, 字典转模型</span><br><span class="line">- (void)setValuesForKeysWithDictionary:(NSDictionary&lt;NSString *, id&gt; *)keyedValues;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Student *stu1 = [[Student alloc] init];</span><br><span class="line">stu1.name = @&quot;haven&quot;;</span><br><span class="line">stu1.num = @&quot;111111&quot;;</span><br><span class="line">stu1.sex = @&quot;男&quot;;</span><br><span class="line"></span><br><span class="line">NSDictionary *dict = [stu1 dictionaryWithValuesForKeys:@[@&quot;name&quot;,@&quot;num&quot;,@&quot;sex&quot;]];</span><br><span class="line">NSLog(@&quot;%@&quot;, dict);</span><br><span class="line">    </span><br><span class="line">NSDictionary *tempDict = @&#123;@&quot;name&quot; : @&quot;haven1&quot;, @&quot;num&quot; : @&quot;1111111&quot;,@&quot;sex&quot; : @&quot;男1&quot;&#125;;</span><br><span class="line">[stu1 setValuesForKeysWithDictionary:tempDict];</span><br><span class="line">NSLog(@&quot;%@ %@ %@&quot;, stu1.name, stu1.num, stu1.sex);</span><br></pre></td></tr></table></figure>
+
+<h5 id="扩展1-KVC设置key值的时候-编译不会报错-但是运行的时候如果不存在这个Key-或者修改了Key-就有可能导致crash-怎么解决此问题"><a href="#扩展1-KVC设置key值的时候-编译不会报错-但是运行的时候如果不存在这个Key-或者修改了Key-就有可能导致crash-怎么解决此问题" class="headerlink" title="扩展1: KVC设置key值的时候,编译不会报错, 但是运行的时候如果不存在这个Key,或者修改了Key, 就有可能导致crash, 怎么解决此问题?"></a>扩展1: KVC设置key值的时候,编译不会报错, 但是运行的时候如果不存在这个Key,或者修改了Key, 就有可能导致crash, 怎么解决此问题?</h5><p>通过@selector()获取到方法的SEL，然后通过NSStringFromSelector()将SEL反射为字符串。这样在@selector()中传入方法名的过程中，编译器会有合法性检查，如果方法不存在或未实现会出现警告</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[self valueForKey:NSStringFromSelector(@selector(name))];</span><br></pre></td></tr></table></figure>
+
+<h5 id="扩展2-集合类型怎么触发KVO-添加多个时怎么只执行一次"><a href="#扩展2-集合类型怎么触发KVO-添加多个时怎么只执行一次" class="headerlink" title="扩展2:  集合类型怎么触发KVO? 添加多个时怎么只执行一次?"></a>扩展2:  集合类型怎么触发KVO? 添加多个时怎么只执行一次?</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">@interface ViewController ()</span><br><span class="line">@property (nonatomic, strong) NSMutableArray *dataArray;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation ViewController</span><br><span class="line">- (void)viewDidLoad &#123;</span><br><span class="line">    [super viewDidLoad];</span><br><span class="line"></span><br><span class="line">    [self addObserver:self forKeyPath:@&quot;dataArray&quot; options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:nil];</span><br><span class="line">    </span><br><span class="line">    [self test3242];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)test3242 &#123;</span><br><span class="line"></span><br><span class="line">    KVCTestModel *testModel1 = [[KVCTestModel alloc] init];</span><br><span class="line">    testModel1.age = 10;</span><br><span class="line">    KVCTestModel *testModel2 = [[KVCTestModel alloc] init];</span><br><span class="line">    testModel2.age = 2;</span><br><span class="line">    KVCTestModel *testModel3 = [[KVCTestModel alloc] init];</span><br><span class="line">    testModel3.kName = @&quot;haven&quot;;</span><br><span class="line">    KVCTestModel *testModel4 = [[KVCTestModel alloc] init];</span><br><span class="line">    testModel4.age = 11;</span><br><span class="line">    KVCTestModel *testModel5 = [[KVCTestModel alloc] init];</span><br><span class="line">    KVCTestModel *testModel6 = [[KVCTestModel alloc] init];</span><br><span class="line"></span><br><span class="line">    NSArray *arr1 = @[testModel1, testModel2];</span><br><span class="line">    // 触发KVO</span><br><span class="line">    self.dataArray = [NSMutableArray arrayWithArray:arr1];</span><br><span class="line">    // 不会触发KVO</span><br><span class="line">    [self.dataArray addObject:testModel3];</span><br><span class="line">    // 可以触发KVO</span><br><span class="line">    [[self mutableArrayValueForKey:@&quot;dataArray&quot;] addObject:testModel4];</span><br><span class="line">    </span><br><span class="line">    NSArray *tempArr = @[testModel5,testModel6];</span><br><span class="line">    // 执行两次KVO, 怎么执行一次呢? 利用KVC特性</span><br><span class="line">    [[self mutableArrayValueForKey:@&quot;dataArray&quot;] addObjectsFromArray:tempArr];</span><br><span class="line">    </span><br><span class="line">    // 添加多元素,执行一次KVO</span><br><span class="line">    NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(self.dataArray.count, tempArr.count)];</span><br><span class="line">    [[self mutableArrayValueForKey:@&quot;dataArray&quot;] insertObjects:tempArr atIndexes:indexSet];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context &#123;</span><br><span class="line">    NSLog(@&quot;change%@&quot;, change);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="扩展3-KVC的场景使用"><a href="#扩展3-KVC的场景使用" class="headerlink" title="扩展3: KVC的场景使用?"></a>扩展3: KVC的场景使用?</h5><ol>
+<li><p>动态地取值和设值</p>
+</li>
+<li><p>用KVC来访问和修改私有变量</p>
+</li>
+<li><p>Model和字典转换</p>
+</li>
+<li><p>修改一些控件包括系统控件的内部属性</p>
+</li>
+<li><p>触发集合类型的KVO</p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/07/创建项目团队的公共组件私有库/" rel="next" title="创建项目团队的公共组件私有库">
+                <i class="fa fa-chevron-left"></i> 创建项目团队的公共组件私有库
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/30/BeeHive使用小记/" rel="prev" title="BeeHive使用小记">
+                BeeHive使用小记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/onepeice-avatar.jpg" alt="Haven">
+            
+              <p class="site-author-name" itemprop="name">Haven</p>
+              <p class="site-description motion-element" itemprop="description">被狮子赶山树也要懂得看风景</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#KVC的本质"><span class="nav-number">1.</span> <span class="nav-text">KVC的本质</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#setValue-forKey-实现原理"><span class="nav-number">1.1.</span> <span class="nav-text">setValue:forKey: 实现原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#valueForKey-实现原理"><span class="nav-number">1.2.</span> <span class="nav-text">valueForKey: 实现原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mutableArrayValueForKey"><span class="nav-number">1.3.</span> <span class="nav-text">mutableArrayValueForKey:</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#mutableArrayValueForKey-实现原理"><span class="nav-number">1.3.1.</span> <span class="nav-text">mutableArrayValueForKey:实现原理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#KVC集合运算符的使用"><span class="nav-number">1.3.2.</span> <span class="nav-text">KVC集合运算符的使用</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#KVC处理字典"><span class="nav-number">1.3.3.</span> <span class="nav-text">KVC处理字典</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#扩展1-KVC设置key值的时候-编译不会报错-但是运行的时候如果不存在这个Key-或者修改了Key-就有可能导致crash-怎么解决此问题"><span class="nav-number">1.3.4.</span> <span class="nav-text">扩展1: KVC设置key值的时候,编译不会报错, 但是运行的时候如果不存在这个Key,或者修改了Key, 就有可能导致crash, 怎么解决此问题?</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#扩展2-集合类型怎么触发KVO-添加多个时怎么只执行一次"><span class="nav-number">1.3.5.</span> <span class="nav-text">扩展2:  集合类型怎么触发KVO? 添加多个时怎么只执行一次?</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#扩展3-KVC的场景使用"><span class="nav-number">1.3.6.</span> <span class="nav-text">扩展3: KVC的场景使用?</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Haven</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
