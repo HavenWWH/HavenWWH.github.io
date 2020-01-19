@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://havenwwh.github.io/2018/10/17/RunLoop底层/runLoop11.png">
 <meta property="og:image" content="https://havenwwh.github.io/2018/10/17/RunLoop底层/runLoop22.png">
-<meta property="og:updated_time" content="2019-12-24T09:41:31.009Z">
+<meta property="og:updated_time" content="2019-12-25T03:29:32.603Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RunLoop底层">
 <meta name="twitter:description" content="RunLoop运行循环, 程序运行过程做一些事, 没事就进入睡眠, 有事件唤醒就进入工作, 也就是在需要的时候工作, 尽最大限度的节省CPU资源">
@@ -345,7 +345,8 @@
 
 <h5 id="运行模式Mode-CFRunLoopModeRef-结构体"><a href="#运行模式Mode-CFRunLoopModeRef-结构体" class="headerlink" title="运行模式Mode: CFRunLoopModeRef 结构体"></a>运行模式Mode: CFRunLoopModeRef 结构体</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">typedef struct __CFRunLoopMode *CFRunLoopModeRef;</span><br><span class="line">struct __CFRunLoopMode &#123;</span><br><span class="line">    CFRuntimeBase _base;</span><br><span class="line">    pthread_mutex_t _lock;  /* must have the run loop locked before locking this */</span><br><span class="line">    CFStringRef _name;</span><br><span class="line">    Boolean _stopped;</span><br><span class="line">    char _padding[3];</span><br><span class="line">    CFMutableSetRef _sources0;</span><br><span class="line">    CFMutableSetRef _sources1;</span><br><span class="line">    CFMutableArrayRef _observers;</span><br><span class="line">    CFMutableArrayRef _timers;</span><br><span class="line">    CFMutableDictionaryRef _portToV1SourceMap;</span><br><span class="line">    __CFPortSet _portSet;</span><br><span class="line">    CFIndex _observerMask;</span><br><span class="line">#if USE_DISPATCH_SOURCE_FOR_TIMERS</span><br><span class="line">    dispatch_source_t _timerSource;</span><br><span class="line">    dispatch_queue_t _queue;</span><br><span class="line">    Boolean _timerFired; // set to true by the source when a timer has fired</span><br><span class="line">    Boolean _dispatchTimerArmed;</span><br><span class="line">#endif</span><br><span class="line">#if USE_MK_TIMER_TOO</span><br><span class="line">    mach_port_t _timerPort;</span><br><span class="line">    Boolean _mkTimerArmed;</span><br><span class="line">#endif</span><br><span class="line">#if DEPLOYMENT_TARGET_WINDOWS</span><br><span class="line">    DWORD _msgQMask;</span><br><span class="line">    void (*_msgPump)(void);</span><br><span class="line">#endif</span><br><span class="line">    uint64_t _timerSoftDeadline; /* TSR */</span><br><span class="line">    uint64_t _timerHardDeadline; /* TSR */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
-<p><img src="/2018/10/17/RunLoop底层/runLoop11.png" alt><br>一个Runloop包含若干个Mode，每个Mode包含若干个Source/Timer/Observer,，每个Mode都是独立的，而且Runloop只能选择一个model运行(currentModel)。如果需要切换 Mode，需要退出RunLoop指定Mode再重新进入RunLoop,这样做主要是为了分隔开不同组的 Source/Timer/Observer，让其互不影响, 一个RunLoop的Mode必须至少有一个sources或者Timer, 否则此Mode视为空Mode, 当RunLoop切换到空Mode时会退出RunLoop</p>
+<p><img src="/2018/10/17/RunLoop底层/runLoop11.png" alt></p>
+<p>一个Runloop包含若干个Mode，每个Mode包含若干个Source/Timer/Observer,，每个Mode都是独立的，而且Runloop只能选择一个model运行(currentModel)。如果需要切换 Mode，需要退出RunLoop指定Mode再重新进入RunLoop,这样做主要是为了分隔开不同组的 Source/Timer/Observer，让其互不影响, 一个RunLoop的Mode必须至少有一个sources或者Timer, 否则此Mode视为空Mode, 当RunLoop切换到空Mode时会退出RunLoop</p>
 <p>五种Mode</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">kCFRunLoopDefaultMode：// App的默认Mode，通常主线程是在这个Mode下运行</span><br><span class="line">UITrackingRunLoopMode：// 界面跟踪 Mode，用于 ScrollView 追踪触摸滑动，保证界面滑动时不受其他 Mode 影响</span><br><span class="line">UIInitializationRunLoopMode: //启动 App 时第进入的第一个 Mode，启动完成后就不再使用，会切换到kCFRunLoopDefaultMode</span><br><span class="line">GSEventReceiveRunLoopMode: // 接受系统事件的内部 Mode，通常用不到</span><br><span class="line">kCFRunLoopCommonModes: // 占位用的Mode，作为标记kCFRunLoopDefaultMode和UITrackingRunLoopMode用，并不是一种真正的Mode</span><br></pre></td></tr></table></figure>
 
@@ -385,6 +386,8 @@
 <h5 id="手势识别"><a href="#手势识别" class="headerlink" title="手势识别"></a>手势识别</h5><p>当上面的 _UIApplicationHandleEventQueue() 识别了一个手势时，其首先会调用 Cancel 将当前的 touchesBegin/Move/End 系列回调打断。随后系统将对应的 UIGestureRecognizer 标记为待处理。<br>苹果注册了一个 Observer 监测 BeforeWaiting (Loop即将进入休眠) 事件，这个Observer的回调函数是 _UIGestureRecognizerUpdateObserver()，其内部会获取所有刚被标记为待处理的 GestureRecognizer，并执行GestureRecognizer的回调。<br>当有 UIGestureRecognizer 的变化(创建/销毁/状态改变)时，这个回调都会进行相应处理  </p>
 <h5 id="界面更新"><a href="#界面更新" class="headerlink" title="界面更新"></a>界面更新</h5><p>当在操作 UI 时，比如改变了 Frame、更新了 UIView/CALayer 的层次时，或者手动调用了 UIView/CALayer 的 setNeedsLayout/setNeedsDisplay方法后，这个 UIView/CALayer 就被标记为待处理。</p>
 <p>苹果注册了一个 Observer 监听 BeforeWaiting(即将进入休眠) 和 Exit (即将退出Loop) 事件，回调去执行一个很长的函数：<br>_ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv()。这个函数里会遍历所有待处理的 UIView/CAlayer 以执行实际的绘制和调整，并更新 UI 界面。</p>
+<h5 id="扩展-NSTimer和RunLoop的关系"><a href="#扩展-NSTimer和RunLoop的关系" class="headerlink" title="扩展: NSTimer和RunLoop的关系?"></a>扩展: NSTimer和RunLoop的关系?</h5><p>NSTimer为了保证调用的方法中对象的生命周期,NSTimer会对外界对象进行一次Retain, 这也是为什么NSTimer需要手动销毁invalidate的原因,如果不手动销毁,无法自动释放, NSTimer默认是添加到主线程对RunLoop中的, 如果在子线程中添加NSTimer需要手动开启RunLoop</p>
+<p><strong>延伸问题: 为什么NSTimer可能存在不准的情况?</strong><br>因为NSTimer是添加到主线程的RunLoop中的,如果定时器触发的那次在RunLoop中做了耗时的操作，当前RunLoop持续的时间超过了定时器的间隔时间(例如做For循环)，那么下一次定时就被延后了, 就造成, 解决办法可以在子线程中创建NSTimer<br>回主线程刷新UI,  或者用其他的方法创建定时器, GCD, CADisplayLink, mach_absolute_time()精度都比NSTimer要高</p>
 
       
     </div>
@@ -425,8 +428,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/01/30/MQTT详解及使用/" rel="prev" title="MQTT详解及使用">
-                MQTT详解及使用 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/11/05/Rumtime基本了解/" rel="prev" title="Rumtime基本了解">
+                Rumtime基本了解 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -506,7 +509,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">25</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -552,7 +555,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#RunLoop"><span class="nav-number">1.</span> <span class="nav-text">RunLoop</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RunLoop与线程的关系"><span class="nav-number">2.</span> <span class="nav-text">RunLoop与线程的关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RunLoop对象以及相关类"><span class="nav-number">3.</span> <span class="nav-text">RunLoop对象以及相关类</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#RunLoop结构体"><span class="nav-number">3.1.</span> <span class="nav-text">RunLoop结构体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#运行模式Mode-CFRunLoopModeRef-结构体"><span class="nav-number">3.2.</span> <span class="nav-text">运行模式Mode: CFRunLoopModeRef 结构体</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#原理"><span class="nav-number">4.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RunLoop在开发中对应用"><span class="nav-number">5.</span> <span class="nav-text">RunLoop在开发中对应用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#线程保活-设置常驻线程"><span class="nav-number">5.1.</span> <span class="nav-text">线程保活(设置常驻线程)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#定时器在滚动的时候停止问题"><span class="nav-number">5.2.</span> <span class="nav-text">定时器在滚动的时候停止问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#自动释放池"><span class="nav-number">5.3.</span> <span class="nav-text">自动释放池</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PerformSelecter"><span class="nav-number">5.4.</span> <span class="nav-text">PerformSelecter</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#事件响应"><span class="nav-number">5.5.</span> <span class="nav-text">事件响应</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#手势识别"><span class="nav-number">5.6.</span> <span class="nav-text">手势识别</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#界面更新"><span class="nav-number">5.7.</span> <span class="nav-text">界面更新</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#RunLoop"><span class="nav-number">1.</span> <span class="nav-text">RunLoop</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RunLoop与线程的关系"><span class="nav-number">2.</span> <span class="nav-text">RunLoop与线程的关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RunLoop对象以及相关类"><span class="nav-number">3.</span> <span class="nav-text">RunLoop对象以及相关类</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#RunLoop结构体"><span class="nav-number">3.1.</span> <span class="nav-text">RunLoop结构体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#运行模式Mode-CFRunLoopModeRef-结构体"><span class="nav-number">3.2.</span> <span class="nav-text">运行模式Mode: CFRunLoopModeRef 结构体</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#原理"><span class="nav-number">4.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RunLoop在开发中对应用"><span class="nav-number">5.</span> <span class="nav-text">RunLoop在开发中对应用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#线程保活-设置常驻线程"><span class="nav-number">5.1.</span> <span class="nav-text">线程保活(设置常驻线程)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#定时器在滚动的时候停止问题"><span class="nav-number">5.2.</span> <span class="nav-text">定时器在滚动的时候停止问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#自动释放池"><span class="nav-number">5.3.</span> <span class="nav-text">自动释放池</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PerformSelecter"><span class="nav-number">5.4.</span> <span class="nav-text">PerformSelecter</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#事件响应"><span class="nav-number">5.5.</span> <span class="nav-text">事件响应</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#手势识别"><span class="nav-number">5.6.</span> <span class="nav-text">手势识别</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#界面更新"><span class="nav-number">5.7.</span> <span class="nav-text">界面更新</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#扩展-NSTimer和RunLoop的关系"><span class="nav-number">5.8.</span> <span class="nav-text">扩展: NSTimer和RunLoop的关系?</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -572,7 +575,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
