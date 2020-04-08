@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="开发日常,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1、内购的四种类型  消耗性项目：在支付成功以后，苹果后台就不会再返回该物品的票据信息。  非消耗性项目：支付成功以后，会永久保留该票据信息，每次校验都会返回。  自动续期订阅：支付成功以后，每次都会自动续期，每次订单都是同一个ID，但标识不同，每次续期成功后返回该ID  非续期订阅：支付成功以后，在有效期内，每次校验订单信息，都会返回处于有效期内订单信息，有效期过期之后不再返回。">
+<meta name="keywords" content="开发日常">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS内购总结">
+<meta property="og:url" content="https://HavenWWH.github.io/2019/04/10/iOS内购总结/index.html">
+<meta property="og:site_name" content="Haven的博客">
+<meta property="og:description" content="1、内购的四种类型  消耗性项目：在支付成功以后，苹果后台就不会再返回该物品的票据信息。  非消耗性项目：支付成功以后，会永久保留该票据信息，每次校验都会返回。  自动续期订阅：支付成功以后，每次都会自动续期，每次订单都是同一个ID，但标识不同，每次续期成功后返回该ID  非续期订阅：支付成功以后，在有效期内，每次校验订单信息，都会返回处于有效期内订单信息，有效期过期之后不再返回。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://havenwwh.github.io/2019/04/10/iOS内购总结/iosIpa1.png">
+<meta property="og:image" content="https://havenwwh.github.io/2019/04/10/iOS内购总结/iosIpa.png">
+<meta property="og:updated_time" content="2020-04-08T06:56:18.218Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS内购总结">
+<meta name="twitter:description" content="1、内购的四种类型  消耗性项目：在支付成功以后，苹果后台就不会再返回该物品的票据信息。  非消耗性项目：支付成功以后，会永久保留该票据信息，每次校验都会返回。  自动续期订阅：支付成功以后，每次都会自动续期，每次订单都是同一个ID，但标识不同，每次续期成功后返回该ID  非续期订阅：支付成功以后，在有效期内，每次校验订单信息，都会返回处于有效期内订单信息，有效期过期之后不再返回。">
+<meta name="twitter:image" content="https://havenwwh.github.io/2019/04/10/iOS内购总结/iosIpa1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://HavenWWH.github.io/2019/04/10/iOS内购总结/">
+
+
+
+
+
+  <title>iOS内购总结 | Haven的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Haven的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2019/04/10/iOS内购总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Haven">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haven的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS内购总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-10T08:12:35+08:00">
+                2019-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>1、内购的四种类型</p>
+<ul>
+<li><p>消耗性项目：在支付成功以后，苹果后台就不会再返回该物品的票据信息。</p>
+</li>
+<li><p>非消耗性项目：支付成功以后，会永久保留该票据信息，每次校验都会返回。</p>
+</li>
+<li><p>自动续期订阅：支付成功以后，每次都会自动续期，每次订单都是同一个ID，但标识不同，每次续期成功后返回该ID</p>
+</li>
+<li><p>非续期订阅：支付成功以后，在有效期内，每次校验订单信息，都会返回处于有效期内订单信息，有效期过期之后不再返回。</p>
+<a id="more"></a>  
+
+</li>
+</ul>
+<p>2、发起支付</p>
+<ul>
+<li>此处是拿iTunes注册的商品ID去像苹果服务器支付</li>
+</ul>
+<p>3、 苹果服务器返回票据信息给App</p>
+<p>4、App将返回的票据信息发送给自家服务器</p>
+<p>5、App服务器携带票据信息，向苹果服务器验证。（应放到服务端去进行验证，此处给一个例子 app端向服务端验证）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">(void)verifyReceipt:(NSData *)receipt purchaseWithPaymentTransaction:(SKPaymentTransaction *)transaction isTestServer:(BOOL)flag</span><br><span class="line">&#123;</span><br><span class="line">        //交易验证</span><br><span class="line">        NSError *error;</span><br><span class="line">        NSDictionary *requestContents = @&#123;</span><br><span class="line"></span><br><span class="line">                                          @&quot;receipt-data&quot;: [receipt base64EncodedStringWithOptions:0]</span><br><span class="line"></span><br><span class="line">                                          &#125;;</span><br><span class="line">        NSData *requestData = [NSJSONSerialization dataWithJSONObject:requestContents</span><br><span class="line"></span><br><span class="line">                                                              options:0</span><br><span class="line"></span><br><span class="line">                                                                error:&amp;error];</span><br><span class="line"></span><br><span class="line">        //In the test environment, use https://sandbox.itunes.apple.com/verifyReceipt</span><br><span class="line"></span><br><span class="line">        //In the real environment, use https://buy.itunes.apple.com/verifyReceipt </span><br><span class="line">        NSString *serverString = @&quot;https://buy.itunes.apple.com/verifyReceipt&quot;;</span><br><span class="line">        if (flag) &#123;</span><br><span class="line">                serverString = @&quot;https://sandbox.itunes.apple.com/verifyReceipt&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">        NSURL *storeURL = [NSURL URLWithString:serverString];</span><br><span class="line">        NSMutableURLRequest *storeRequest = [NSMutableURLRequest requestWithURL:storeURL];</span><br><span class="line">        [storeRequest setHTTPMethod:@&quot;POST&quot;]; </span><br><span class="line">        [storeRequest setHTTPBody:requestData];</span><br><span class="line">        NSOperationQueue *queue = [[NSOperationQueue alloc] init];</span><br><span class="line">        [NSURLConnection sendAsynchronousRequest:storeRequest queue:queue</span><br><span class="line">                               completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) &#123;                                      </span><br><span class="line">                                       if (connectionError) &#123;</span><br><span class="line">                                               // 无法连接服务器,购买校验失败 </span><br><span class="line">                                               [self finished:transaction content:nil withError:connectionError];</span><br><span class="line">                                       &#125; else &#123;</span><br><span class="line">                                               NSError *error;</span><br><span class="line">                                               NSDictionary *jsonResponse = [NSJSONSerialization JSONObjectWithData:data options:0 error:&amp;error];</span><br><span class="line">                                               if (!jsonResponse) &#123;</span><br><span class="line">                                                       // 苹果服务器校验数据返回为空校验失败</span><br><span class="line">                                                       NSError *recepitErr = [NSError errorWithDomain:PayiTunesErrorDomain code:-1 userInfo:@&#123;NSLocalizedDescriptionKey : ErrorDesForCode(PayiTunesErrorCodeCloudServiceNetworkConnectionFailed)&#125;];</span><br><span class="line">                                                       [self finished:transaction content:nil withError:recepitErr];</span><br><span class="line">                                                &#125;</span><br><span class="line">                                               NSLogDebug(@&quot;----验证结果 %@&quot;,jsonResponse);</span><br><span class="line">                                               // 先验证正式服务器,如果正式服务器返回21007再去苹果测试服务器验证,沙盒测试环境苹果用的是测试服务器</span><br><span class="line">                                               NSString *status = [NSString stringWithFormat:@&quot;%@&quot;,jsonResponse[@&quot;status&quot;]];</span><br><span class="line">                                               if (status &amp;&amp; [status isEqualToString:@&quot;21007&quot;]) &#123;</span><br><span class="line">                                                       [self verifyReceipt:receipt purchaseWithPaymentTransaction:transaction isTestServer:YES];</span><br><span class="line">                                               &#125; else if(status &amp;&amp; [status isEqualToString:@&quot;0&quot;])&#123;</span><br><span class="line">                                                       [self finished:transaction content:nil withError:nil];</span><br><span class="line">                                               &#125;</span><br><span class="line">                                       &#125;</span><br><span class="line">                               &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>6、返回校验结果，服务器根据不同类型商品去选择对应处理方式</p>
+<ul>
+<li><p>如果应用内都是消耗性物品购买。只需去inapp字段的第一个值就可以    </p>
+</li>
+<li><p>如果应用内有第二种和第四种，就需要遍历循环inapp的字段处理，判断里面的original_transaction_id,是否已经被使用过，如果使用过，忽略。如果未使用，标记对应状态，入库存储。</p>
+</li>
+<li><p>如果有第三种状态，同样遍历循环inapp字段，判断original_transaction_id和transaction_id，是否需要增加续订日子(未测试)</p>
+<p>7、 如果是网络问题或者是服务器数据问题，导致客户端接收到错误信息，则该笔交易未完成，但是苹果后台的标示是已付款。则app再次向苹果服务器发起支付的时候，不会扣费，之后返回对应票据信息。</p>
+</li>
+</ul>
+<p>8、拿到票据信息向苹果服务器做验证的状态码：</p>
+<p><img src="/2019/04/10/iOS内购总结/iosIpa1.png" alt></p>
+<p><img src="/2019/04/10/iOS内购总结/iosIpa.png" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/开发日常/" rel="tag"># 开发日常</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/01/NSNotificationCenter通知的原理/" rel="next" title="NSNotificationCenter通知的原理">
+                <i class="fa fa-chevron-left"></i> NSNotificationCenter通知的原理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/onepeice-avatar.jpg" alt="Haven">
+            
+              <p class="site-author-name" itemprop="name">Haven</p>
+              <p class="site-description motion-element" itemprop="description">被狮子赶山树也要懂得看风景</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">43</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Haven</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
