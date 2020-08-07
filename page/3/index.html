@@ -262,6 +262,134 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/08/11/Pod中获取图片进行倍图的适配/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Haven">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haven的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/11/Pod中获取图片进行倍图的适配/" itemprop="url">Pod中获取图片进行倍图的适配</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-11T19:43:05+08:00">
+                2018-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>1,  获取当前资源所在的bundle,  self可以是与图片资源所在的任意一个类 (需要注意self存在继承使用的时候)</p>
+<p>NSBundle *CurrentBundle = [NSBundle bundleForClass: [self class]];</p>
+<p>2, 获取屏幕比例</p>
+<p>NSInteger scale = [UIScreen mainScreen].scale;</p>
+<p>3, 获取BundleName</p>
+<p>NSString *CurrentBundleName =  [NSString stringWithFormat:@”%@.bundle”,  CurrentBundle.infoDictionary[@”CFBundleExecutable”]];</p>
+<p>4, 获取图片路径</p>
+<p>NSString *path = [CurrentBundle pathForResource: [NSString stringWithFormat: @”plus@%zdx.png”, ImageScale] ofType: nil inDirectory: CurrentBundleName];</p>
+<p>注意:   pod中无法自动适配倍图,  需要手动进行适配, 而且Pod中使用图片必须使用全名 ( ***@2x.png)</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/08/10/iCarousel使用说明/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1723,130 +1851,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/06/13/KVC/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Haven">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Haven的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/13/KVC/" itemprop="url">KVC</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-13T10:40:05+08:00">
-                2018-06-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h3 id="KVC的本质"><a href="#KVC的本质" class="headerlink" title="KVC的本质"></a>KVC的本质</h3><p>全名Key Value Coding, 一种访问属性方法或成员变量的机制，通过字符串来访问属性方法或成员变量 </p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/06/13/KVC/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1899,7 +1903,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-count">50</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="iOS,">
+  <meta name="keywords" content="开发日常,">
 
 
 
@@ -79,22 +79,18 @@
 
 
 
-<meta name="description" content="iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)">
-<meta name="keywords" content="iOS">
+<meta name="description" content="NSURLComponents 其实就是一个URL相关的类, 这个类专门用来处理URL的, 比用NSMutablURL 或者转NSURL 更安全,  NSURLComponents的NSURL属性是只读的, 无法操作, 不过苹果提供了其他一系列的方法方便我们处理URL">
+<meta name="keywords" content="开发日常">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS响应链之事件传递和响应">
-<meta property="og:url" content="https://HavenWWH.github.io/2017/08/18/iOS响应链之事件传递和响应/index.html">
+<meta property="og:title" content="WKWebView之NSURLComponents">
+<meta property="og:url" content="https://HavenWWH.github.io/2020/07/15/WKWebView之NSURLComponents/index.html">
 <meta property="og:site_name" content="Haven的博客">
-<meta property="og:description" content="iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)">
+<meta property="og:description" content="NSURLComponents 其实就是一个URL相关的类, 这个类专门用来处理URL的, 比用NSMutablURL 或者转NSURL 更安全,  NSURLComponents的NSURL属性是只读的, 无法操作, 不过苹果提供了其他一系列的方法方便我们处理URL">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://havenwwh.github.io/2017/08/18/iOS响应链之事件传递和响应/Responder1.png">
-<meta property="og:image" content="https://havenwwh.github.io/2017/08/18/iOS响应链之事件传递和响应/Responder3.png">
-<meta property="og:image" content="https://havenwwh.github.io/2017/08/18/iOS响应链之事件传递和响应/Responder2.png">
-<meta property="og:updated_time" content="2019-11-15T09:46:28.654Z">
+<meta property="og:updated_time" content="2020-08-07T07:36:14.223Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS响应链之事件传递和响应">
-<meta name="twitter:description" content="iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)">
-<meta name="twitter:image" content="https://havenwwh.github.io/2017/08/18/iOS响应链之事件传递和响应/Responder1.png">
+<meta name="twitter:title" content="WKWebView之NSURLComponents">
+<meta name="twitter:description" content="NSURLComponents 其实就是一个URL相关的类, 这个类专门用来处理URL的, 比用NSMutablURL 或者转NSURL 更安全,  NSURLComponents的NSURL属性是只读的, 无法操作, 不过苹果提供了其他一系列的方法方便我们处理URL">
 
 
 
@@ -124,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://HavenWWH.github.io/2017/08/18/iOS响应链之事件传递和响应/">
+  <link rel="canonical" href="https://HavenWWH.github.io/2020/07/15/WKWebView之NSURLComponents/">
 
 
 
 
 
-  <title>iOS响应链之事件传递和响应 | Haven的博客</title>
+  <title>WKWebView之NSURLComponents | Haven的博客</title>
   
 
 
@@ -267,7 +263,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/08/18/iOS响应链之事件传递和响应/">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2020/07/15/WKWebView之NSURLComponents/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Haven">
@@ -284,7 +280,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">iOS响应链之事件传递和响应</h1>
+          <h1 class="post-title" itemprop="name headline">WKWebView之NSURLComponents</h1>
         
 
         <div class="post-meta">
@@ -296,8 +292,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-18T21:23:05+08:00">
-                2017-08-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-15T12:12:22+08:00">
+                2020-07-15
               </time>
             
 
@@ -334,24 +330,25 @@
       
 
       
-        <p>iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)</p>
+        <p>NSURLComponents 其实就是一个URL相关的类, 这个类专门用来处理URL的, 比用NSMutablURL 或者转NSURL 更安全,  NSURLComponents的NSURL属性是只读的, 无法操作, 不过苹果提供了其他一系列的方法方便我们处理URL</p>
 <a id="more"></a>
 
-<h3 id="事件传递"><a href="#事件传递" class="headerlink" title="事件传递"></a>事件传递</h3><p>事件传递是从父控件传递到子控件的, 当检测到手指触摸（Touch）操作时会将其打包成一个UIEvent对象，并放入当前活动UIApplication的事件队列中, UIApplication会从事件队列中取出触摸事件并传递给UIWindow, 一直传递到一个最合适的视图View来处理事件</p>
-<p>传递顺序: UIApplication —&gt;UIWindow —&gt;Subview —&gt; View</p>
-<p>系统是怎么找出最合适的View的呢, 依赖hitTest:withEvent:方法去判断点击的点是否在当前View内,  如果是则便利当前View的SubView继续调用hitTest:withEvent:方法, 直到找到最合适的View, 如下图(图片来源网络)</p>
-<p><img src="/2017/08/18/iOS响应链之事件传递和响应/Responder1.png" alt></p>
-<p><img src="/2017/08/18/iOS响应链之事件传递和响应/Responder3.png" alt></p>
-<p>注意⚠️: 遍历subVIews是根据当前subview的index顺序，index越大就越先被访问</p>
-<h3 id="事件响应"><a href="#事件响应" class="headerlink" title="事件响应"></a>事件响应</h3><p><img src="/2017/08/18/iOS响应链之事件传递和响应/Responder2.png" alt></p>
-<p>首先看initial view能否处理这个事件，如果不能则会将事件传递给其上级视图（inital view的superView）；如果上级视图仍然无法处理则会继续往上传递；一直传递到视图控制器view controller，首先判断视图控制器的根视图view是否能处理此事件；如果不能则接着判断该视图控制器能否处理此事件，如果还是不能则继续向上传 递；（对于第二个图视图控制器本身还在另一个视图控制器中，则继续交给父视图控制器的根视图，如果根视图不能处理则交给父视图控制器处理）；一直到 window，如果window还是不能处理此事件则继续交给application处理，如果最后application还是不能处理此事件则将其丢弃</p>
-<figure class="highlight plain"><figcaption><span>(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event &#123;</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// 1.判断当前控件能否接收事件</span><br><span class="line">if (self.userInteractionEnabled == NO || self.hidden == YES || self.alpha &lt;= 0.01) return nil;</span><br><span class="line">// 2. 判断点在不在当前控件</span><br><span class="line">if ([self pointInside:point withEvent:event] == NO) return nil;</span><br><span class="line">// 3.从后往前遍历自己的子控件</span><br><span class="line">NSInteger count = self.subviews.count;</span><br><span class="line">for (NSInteger i = count - 1; i &gt;= 0; i--) &#123;</span><br><span class="line">   UIView *childView = self.subviews[I];</span><br><span class="line">   // 把当前控件上的坐标系转换成子控件上的坐标系</span><br><span class="line">   CGPoint childP = [self convertPoint:point toView:childView];</span><br><span class="line">   UIView *fitView = [childView hitTest:childP withEvent:event];</span><br><span class="line">   if (fitView) &#123; // 寻找到最合适的view</span><br><span class="line">     return fitView;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">// 循环结束,表示没有比自己更合适的view</span><br><span class="line">return self;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>scheme</li>
+<li>user</li>
+<li>password</li>
+<li>host</li>
+<li>port</li>
+<li>path</li>
+<li>query</li>
+<li>fragment</li>
+</ul>
+<p>项目中使用的例子, 使用WKWebView加载本地文件:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">( WKNavigation *)loadFileURL:(NSURL *)URL allowingReadAccessToURL:(NSURL *)readAccessURL</span><br></pre></td></tr></table></figure>
 
-<p>问题: 子View 是 UIView时，如果没有添加手势，点击子 View时，会由其父View来响应，而 子View 是 UIControl 时，子View 没有添加手势，一样不会由 父View 来响应</p>
-<p>原因: UIControl默认实现了以下方法</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;</span><br><span class="line">- (<span class="keyword">void</span>)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event;</span><br><span class="line">- (<span class="keyword">void</span>)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event;</span><br><span class="line">- (<span class="keyword">void</span>)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event;</span><br></pre></td></tr></table></figure>
+<p>使用NSURLComponents添加参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">NSURLComponents *urlComponents = [NSURLComponents componentsWithURL:str resolvingAgainstBaseURL:NO];</span><br><span class="line"></span><br><span class="line">[urlComponents setQueryItems:@[[NSURLQueryItem queryItemWithName:@&quot;userId&quot; value:@&quot;value&quot;]]];</span><br></pre></td></tr></table></figure>
 
-<p>如果某个控件实现了touches…方法，则这个事件将由该控件来接受，如果调用了[supertouches….];就会将事件顺着响应者链条往上传递，传递给上一个响应者；接着就会调用上一个响应者的touches….方法</p>
 
       
     </div>
@@ -369,7 +366,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/iOS/" rel="tag"># iOS</a>
+            <a href="/tags/开发日常/" rel="tag"># 开发日常</a>
           
         </div>
       
@@ -382,8 +379,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/08/10/iOS适配方案/" rel="next" title="iOS适配方案">
-                <i class="fa fa-chevron-left"></i> iOS适配方案
+              <a href="/2020/05/15/一键登录总结/" rel="next" title="一键登录总结">
+                <i class="fa fa-chevron-left"></i> 一键登录总结
               </a>
             
           </div>
@@ -391,10 +388,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/09/01/removeFromSuperview详解/" rel="prev" title="removeFromSuperview详解">
-                removeFromSuperview详解 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -446,17 +439,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -509,22 +493,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#事件传递"><span class="nav-number">1.</span> <span class="nav-text">事件传递</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事件响应"><span class="nav-number">2.</span> <span class="nav-text">事件响应</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
