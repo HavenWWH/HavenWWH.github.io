@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="fastlane自动打包详细流程">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fastlane自动打包详细流程">
+<meta property="og:url" content="https://HavenWWH.github.io/2020/04/11/fastlane自动打包详细流程/index.html">
+<meta property="og:site_name" content="Haven的博客">
+<meta property="og:description" content="fastlane自动打包详细流程">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/1.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/2.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/3.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/4.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/5.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/6.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/7.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/8.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/9.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/10.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/11.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/12.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/13.png">
+<meta property="og:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/14.png">
+<meta property="og:updated_time" content="2020-08-31T02:48:31.984Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="fastlane自动打包详细流程">
+<meta name="twitter:description" content="fastlane自动打包详细流程">
+<meta name="twitter:image" content="https://havenwwh.github.io/2020/04/11/fastlane自动打包详细流程/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://HavenWWH.github.io/2020/04/11/fastlane自动打包详细流程/">
+
+
+
+
+
+  <title>fastlane自动打包详细流程 | Haven的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Haven的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2020/04/11/fastlane自动打包详细流程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Haven">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haven的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">fastlane自动打包详细流程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-11T12:10:05+08:00">
+                2020-04-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>fastlane自动打包详细流程</p>
+<a id="more"></a>
+
+<p><strong>一, fastlane 安装</strong></p>
+<p>执行一下命令安装fastlane</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo gem install fastlane</span><br></pre></td></tr></table></figure>
+
+<p>注意安装过程报错如下图(权限问题)</p>
+<p><img src="/2020/04/11/fastlane自动打包详细流程/1.png" alt></p>
+<p>解决方案:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo gem install fastlane -n /usr/local/bin</span><br></pre></td></tr></table></figure>
+
+<p>等待fastlane安装成功</p>
+<p><strong>二, fastlane 初始化</strong></p>
+<p>1.初始化命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastlane init</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/04/11/fastlane自动打包详细流程/2.png" alt></p>
+<p>2.如上图选择3,发布到AppStore</p>
+<p>3.是否需要fastlane管理元数据, y或者都可以, 我这里选择y</p>
+<p><img src="/2020/04/11/fastlane自动打包详细流程/3.png" alt></p>
+<p>4.输入appleId及密码</p>
+<p><img src="/2020/04/11/fastlane自动打包详细流程/4.png" alt></p>
+<p>5.输入双重认证密码(没有双重认证略过)</p>
+<p><img src="/2020/04/11/fastlane自动打包详细流程/5.png" alt></p>
+<p>初始化成功会在项目目录下生成以下文件</p>
+<p><strong>Appfile: 存储有关开发者账号相关信息</strong></p>
+<p><strong>Fastfile: 核心文件，主要用于命令行调用和处理具体的流程, 配置各种环境下打包参数</strong></p>
+<p><strong>Deliverfile: deliver工具的配置文件,</strong></p>
+<p><strong>metadata: 元数据文件夹</strong></p>
+<p><strong>Matchfile: Match操作对应的配置文件,证书</strong></p>
+<p><strong>screenshots: 截图文件夹</strong></p>
+<p><strong>三, fastlane 发布到蒲公英</strong></p>
+<p>1.安装蒲公英插件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastlane add_plugin payer</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/04/11/fastlane自动打包详细流程/6.png" alt></p>
+<p>安装失败则使用以下命令安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bundle exec fastlane add_plugin payer</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/04/11/fastlane自动打包详细流程/7.png" alt></p>
+<p>等待安装成功</p>
+<p>2.配置蒲公英参数</p>
+<ol>
+<li>打开Fastfile文件进行配置</li>
+</ol>
+<p>#scheme ：指定打的哪个scheme</p>
+<p>#project ：指定project (未使用cocopods)</p>
+<p>#workspace ：指定workspace (使用cocopods)</p>
+<p>#clean ：打包前clean</p>
+<p>#xcargs ： 附加一些参数传递给xcodebuild 如： xcargs: ‘DEBUG_INFORMATION_FORMAT=”dwarf-with-#dsym”‘,</p>
+<p>#export_method ：出包方法 app-store, ad-hoc, package, enterprise, development</p>
+<p>#configuration ： 指定构建App的配置  Release、Debug、自定义</p>
+<p>#output_directory ： 输出目录</p>
+<p>#output_name ：输出名称</p>
+<p>#include_symbols ：是否包含调试符号</p>
+<p>#include_bitcode ：是否开启bitcode</p>
+<ol start="2">
+<li>配置如下:</li>
+</ol>
+<p><img src="/2020/04/11/fastlane自动打包详细流程/8.png" alt></p>
+<p>蒲公英的密钥去蒲公英后台获取填入就行</p>
+<ol start="3">
+<li>自动打包发布到蒲公英</li>
+</ol>
+<p>打开终端, 进入目录,执行以下命令就可以</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastlane CDDebug</span><br></pre></td></tr></table></figure>
+
+<p><strong>四, fastlane 发布到fir</strong></p>
+<p>1.安装fir插件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastlane add_plugin fir_cli</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/04/11/fastlane自动打包详细流程/9.png" alt></p>
+<p>2.配置fir参数</p>
+<ol>
+<li>打开Fastfile文件进行配置</li>
+</ol>
+<p><strong>注意:必须配置firim_api_url:’<a href="http://api/jappstore.com/&#39;" target="_blank" rel="noopener">http://api/jappstore.com/&#39;</a></strong></p>
+<ol start="2">
+<li>配置如下:</li>
+</ol>
+<p><img src="/2020/04/11/fastlane自动打包详细流程/10.png" alt></p>
+<p>fir密钥去fir后台获取</p>
+<ol start="3">
+<li>自动打包发布到fir</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastlane CDAdhoc</span><br></pre></td></tr></table></figure>
+
+<p><strong>四, fastlane 发布到appStore</strong></p>
+<p>自动打包发布到AppStrore必须先了解fastlane的Actions,Action是Fastlane自动化流程中的最小执行单元，直观上来讲就是Fastfile脚本中的一个个命令，而这些命令背后都对应一个用Ruby编写的脚本。Fastlane的工具集大约包含180多个Action，基本上涵盖了打包，签名，测试，部署，发布，库管理等等移动开发中涉及到的内容, 下面讲几个重要和常用的action</p>
+<p><a href="https://github.com/fastlane/fastlane/tree/master/match" target="_blank" rel="noopener"><strong>match</strong></a><strong>:  一个新的证书和配置文件管理工具。把所有需要用到的证书传到git私有库上，任何需要配置的机器直接用match同步回来就不用管证书问题了</strong></p>
+<p>match只认识通过match方式创建的pp文件 证书，其他方式创建的不予理会。</p>
+<p>使用match 需要先撤销现在的证书。</p>
+<p>如果苹果端的证书,pp文件已删除，那么远端git上的文件也会失效，并且在重新match的时候会失败,只能删光 git端内容，重新match一遍。</p>
+<p>常用参数：</p>
+<ol>
+<li>git_url ： 指定对应git地址</li>
+<li>git_branch ： 指定对应branch</li>
+<li>type ：请求文件类型, appstore, adhoc, development, enterprise</li>
+<li>app_identifier ： app_bundle_identify</li>
+<li>clone_branch_directly : 只更新对应branch，只有在存在这个branch时才生效</li>
+<li>force_for_new_devices : 如果设备devices列表更新了，就强制更新配置概要文件</li>
+<li>verbose ：打印出额外的信息和所有的命令</li>
+</ol>
+<p><a href="https://github.com/fastlane/fastlane/tree/master/gym" target="_blank" rel="noopener"><strong>gym</strong></a><strong>:  Fastlane家族的自动化编译工具，和其他工具配合的非常默契</strong></p>
+<p>常用参数：</p>
+<p>scheme ：指定打的哪个scheme</p>
+<p>project ：指定project (未使用cocopods)</p>
+<p>workspace ：指定workspace (使用cocopods)</p>
+<p>clean ：打包前clean</p>
+<p>xcargs ： 附加一些参数传递给xcodebuild 如： xcargs: ‘DEBUG_INFORMATION_FORMAT=”dwarf-with-dsym”‘,</p>
+<p>export_method ：出包方法 app-store, ad-hoc, package, enterprise, development</p>
+<p>configuration ： 指定构建App的配置  Release、Debug、自定义</p>
+<p>output_directory ： 输出目录</p>
+<p>output_name ：输出名称</p>
+<p>include_symbols ：是否包含调试符号</p>
+<p>include_bitcode ：是否开启bitcode</p>
+<p><a href="https://github.com/fastlane/fastlane/tree/master/deliver" target="_blank" rel="noopener"><strong>deliver</strong></a><strong>:  自动上传截图，APP的元数据，二进制(ipa)文件到iTunes Connect,</strong></p>
+<p>常用参数:</p>
+<p>skip_screenshots: true, // 跳过上传截图</p>
+<p>skip_metadata: true // 跳过提交元数据</p>
+<p><a href="https://github.com/fastlane/fastlane/tree/master/pilot" target="_blank" rel="noopener"><strong>pilot</strong></a><strong>: 管理TestFlight的测试用户，上传二进制文件</strong></p>
+<p>常用参数:</p>
+<p>ipa ：要提交的包地址</p>
+<p>team_name、team_id ：如果有多个team 用于区分team</p>
+<p>skip_waiting_for_build_processing ： 在提交完成后的等待是否跳过，一般跳过</p>
+<p>changelog</p>
+<p>testflight(</p>
+<p>  ipa : ‘../xx.ipa’</p>
+<p>)</p>
+<p><strong>1.Fastlfile配置上传到AppStore</strong></p>
+<p><img src="/2020/04/11/fastlane自动打包详细流程/11.png" alt></p>
+<p><strong>2.自动打包发布到appStore</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastlane CDRelease</span><br></pre></td></tr></table></figure>
+
+<p>注意打包完成提交到AppConnect的时候, 如果开发者账户开启了双重认证 过程中需要输入苹果App专用密钥</p>
+<p><img src="/2020/04/11/fastlane自动打包详细流程/12.png" alt></p>
+<p><img src="/2020/04/11/fastlane自动打包详细流程/13.png" alt></p>
+<p>输入专用密钥后,等待上传成功, 在AppConnect查看(打包过程需要输入专用密钥, 无法完成全自动化打包, 后面有解决方案)</p>
+<p><strong>fastlane 自动打包过程因双重认证需要输入专用密码问题 (</strong>bkmo-zrja-zkog-kvot<strong>)</strong></p>
+<p>问题: 如果开发者账户开启了双重认证, 则发布到AppStore的时候必须手动输入专用密钥, 这样就导致无法实现一键打包功能</p>
+<p>解决方案:</p>
+<ol>
+<li>获取专用密钥A</li>
+<li>打开/.bash_profile 配置A</li>
+</ol>
+<p>export FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD=A</p>
+<ol start="3">
+<li>终端输入以下命令 获取变量名</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastlane spaceauth -u 开发者账号</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/04/11/fastlane自动打包详细流程/14.png" alt></p>
+<p>4.将变量配置到/.bash_profile</p>
+<p>export FASTLANE_SESSION=’’</p>
+<p>5.启动环境变量</p>
+<p>source ~/.bash_profile </p>
+<p><strong>注意:session会过期 所以需要定期更新</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/10/selector 、SEL 、@selector(SEL原理)/" rel="next" title="selector 、SEL 、@selector(SEL原理)">
+                <i class="fa fa-chevron-left"></i> selector 、SEL 、@selector(SEL原理)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/05/10/githubusercontent443错误/" rel="prev" title="githubusercontent443错误">
+                githubusercontent443错误 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/onepeice-avatar.jpg" alt="Haven">
+            
+              <p class="site-author-name" itemprop="name">Haven</p>
+              <p class="site-description motion-element" itemprop="description">被狮子赶山树也要懂得看风景</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">55</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Haven</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

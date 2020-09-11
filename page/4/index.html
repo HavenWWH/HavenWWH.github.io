@@ -262,6 +262,272 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/07/15/app打开小程序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Haven">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haven的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/15/app打开小程序/" itemprop="url">app打开小程序</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-15T18:12:15+08:00">
+                2018-07-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>1、po ‘WechatOpenSDK’</p>
+<p>2、配置</p>
+<p><img src="/2018/07/15/app打开小程序/appxcx.png" alt></p>
+<p>3、weixin 加入到 LSApplicationQueriesSchemes白名单</p>
+<p>4、App Transport Security Settings、Allow Arbitrary Loads打开</p>
+<p>5、AppDelegate中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">#import &quot;WXApi.h&quot;</span><br><span class="line"> </span><br><span class="line">@interface CDAppDelegate : UIResponder &lt;UIApplicationDelegate, WXApiDelegate&gt;</span><br><span class="line"> </span><br><span class="line">@property (strong, nonatomic) UIWindow *window;</span><br><span class="line"> </span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">#import &quot;CDAppDelegate.h&quot;</span><br><span class="line"></span><br><span class="line">#import &quot;CDViewController.h&quot;</span><br><span class="line"></span><br><span class="line">@implementation CDAppDelegate</span><br><span class="line"></span><br><span class="line">- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions</span><br><span class="line"> </span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    [WXApi registerApp:@&quot;wx9******&quot;];</span><br><span class="line"> </span><br><span class="line">//    [WXApi registerApp:@&quot;wx425878e5ac948779&quot;];</span><br><span class="line"></span><br><span class="line">    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];</span><br><span class="line"> </span><br><span class="line">    self.window.backgroundColor = [UIColor whiteColor];</span><br><span class="line"> </span><br><span class="line">     </span><br><span class="line"> </span><br><span class="line">    self.window.rootViewController = [CDViewController new];</span><br><span class="line"> </span><br><span class="line">    [self.window makeKeyAndVisible];</span><br><span class="line"> </span><br><span class="line">    return true;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url &#123;</span><br><span class="line"> </span><br><span class="line">    return  [WXApi handleOpenURL:url delegate:self];</span><br><span class="line">&#125;</span><br><span class="line">- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation &#123;</span><br><span class="line"> </span><br><span class="line">    return [WXApi handleOpenURL:url delegate:self];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(void) onReq:(BaseReq*)req &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(void) onResp:(BaseResp*)resp &#123;</span><br><span class="line">    if ([resp isKindOfClass:[WXLaunchMiniProgramResp class]])</span><br><span class="line">    &#123;</span><br><span class="line">        WXLaunchMiniProgramReq *miniProgramReq = (WXLaunchMiniProgramReq *)resp;</span><br><span class="line">        NSString *string = miniProgramReq.extMsg;</span><br><span class="line">        // 对应JsApi navigateBackApplication中的extraData字段数据     </span><br><span class="line">        NSLog(@&quot;%@&quot;, string);</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>6、打开小程序代码  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">WXLaunchMiniProgramReq *launchMiniProgramReq = [WXLaunchMiniProgramReq object];</span><br><span class="line"> </span><br><span class="line"> launchMiniProgramReq.userName = @&quot;*******&quot;;  //拉起的小程序的原始ID</span><br><span class="line"> </span><br><span class="line">    //    launchMiniProgramReq.path = @&quot;pages/index/index&quot;; //拉起小程序页面的可带参路径，不填默认拉起小程序首页</span><br><span class="line"> </span><br><span class="line"> launchMiniProgramReq.miniProgramType = WXMiniProgramTypeRelease; //拉起小程序的类型</span><br><span class="line"> </span><br><span class="line">[WXApi sendReq:launchMiniProgramReq];</span><br></pre></td></tr></table></figure>
+
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/07/03/iOS优化ipa大小/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Haven">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haven的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/03/iOS优化ipa大小/" itemprop="url">iOS优化ipa大小</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-03T08:12:35+08:00">
+                2018-07-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>1、配置编译选项 </p>
+<p>Levels选项内）Generate Debug Symbols  设置为NO，这个配置选项应该会让你减去小半的体积。注意这个如果设置成NO就不会在断点处停下</p>
+<p><img src="/2018/07/03/iOS优化ipa大小/ipa1.png" alt></p>
+<p>2、舍弃架构armv7</p>
+<p>armv7用于支持4s和4，4s是2011年11月正式上线，虽然还有小部分人在使用，但是追求包体大小的完全可以舍弃了。</p>
+<p>3、去除无用的三方库、代码、readme</p>
+<p>4、图片处理</p>
+<ul>
+<li>用imageoptim压缩图片的大小，图片放进工程之前记得压缩、修改名字，养成好的编码习惯。</li>
+<li>用LSUnusedResource这个软件查找项目中没有用到的图片，然后删除，当然不一定特别准确，有一些[UIImage imageNamed:[NSString stringWithFormat:@”icon_%d”,index]]这样使用的图片也会被列在未使用图片中。</li>
+<li>build setting 里 DEAD_CODE_STRIPPING = YES（好像默认就是YES）。 确定 dead code（代码被定义但从未被调用）被剥离，去掉冗余的代码，即使一点冗余代码，编译后体积也是很可观的。</li>
+</ul>
+<p>5、编译器优化级别</p>
+<p>Build Settings-&gt;Optimization Level有几个编译优化选项，release版应该选择Fastest, Smalllest[-Os]，这个选项会开启那些不增加代码大小的全部优化，并让可执行文件尽可能小。</p>
+<p>6、去除符号信息</p>
+<p>Strip Debug Symbols During Copy 和 Symbols Hidden by Default 在release版本应该设为yes，可以去除不必要的调试符号。Symbols Hidden by Default会把所有符号都定义成”private extern”，设了后会减小体积。</p>
+<p>7、Strip Linked Product：DEBUG下设为NO，RELEASE下设为YES，用于RELEASE模式下缩减app的大小</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/07/01/Category/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1244,469 +1510,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/04/15/msgt基本框架/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Haven">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Haven的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/15/msgt基本框架/" itemprop="url">msgt基本框架</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-15T18:22:35+08:00">
-                2018-04-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><strong>一、组织结构</strong></p>
-<p>FTProgramme</p>
-<p>├── AppDelegate – 继承 BHAppDelegate ， app 启动配置 BHAppDelegate，模块内配置各自的启动操作。</p>
-<p>├── MemoryCheck – facebook/FBMemoryProfiler, 可选内存检测，通过配置 FBMemoryProfiler 宏控制</p>
-<p>├── Router – 路由接口配置. url scheme 是 [mls]</p>
-<p>├── Animations – 动画配置</p>
-<p>├── CDThirdCode – 修改过源码的三方库</p>
-<p>├── ThirdLibrary – 三方库 framework/lib</p>
-<p>├── ThirdUI – 三方UI模板[QMUIKit]</p>
-<p>├── Utils – 工具类</p>
-<p>├── Manager – 管理类[数据存储、Base类、Define]</p>
-<p>├── Resource – 资源</p>
-<p>├── Moudles – 模块</p>
-<p>|    ├── Update – App升级模块</p>
-<p>|    ├── Main – App 主页面模块 [UITabBarController/IIViewDeckController]</p>
-<p>|    ├── Config – 项目配置模块</p>
-<p>|    ├── APNS – App推送模块</p>
-<p>|    ├──User –  用户管理模块，注册，登录，以及跟用户相关的内容</p>
-<p>|    ├── Pay–  支付模块</p>
-<p>|    └── Common – 公用模块</p>
-<p>二、架构</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>名称介绍</th>
-<th>官网</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>BeeHive</td>
-<td>模块化编程</td>
-<td><a href="https://github.com/alibaba/BeeHive" target="_blank" rel="noopener">https://github.com/alibaba/BeeHive</a></td>
-</tr>
-<tr>
-<td>JLRoutes</td>
-<td>路由[模块解耦]</td>
-<td><a href="https://github.com/joeldev/JLRoutes" target="_blank" rel="noopener">https://github.com/joeldev/JLRoutes</a></td>
-</tr>
-</tbody></table>
-<p>三、网络</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>名称介绍</th>
-<th>官网</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>YTKNetwork</td>
-<td>网络框架</td>
-<td><a href="https://github.com/yuantiku/YTKNetwork" target="_blank" rel="noopener">https://github.com/yuantiku/YTKNetwork</a></td>
-</tr>
-<tr>
-<td>HLNetWorkReachability</td>
-<td>网络状态检测</td>
-<td><a href="https://github.com/Haley-Wong/HLNetWorkReachability" target="_blank" rel="noopener">https://github.com/Haley-Wong/HLNetWorkReachability</a></td>
-</tr>
-<tr>
-<td>GCDWebServer</td>
-<td>本地服务</td>
-<td><a href="https://github.com/swisspol/GCDWebServer" target="_blank" rel="noopener">https://github.com/swisspol/GCDWebServer</a></td>
-</tr>
-</tbody></table>
-<p>四、性能调试</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>名称介绍</th>
-<th>官网</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>MLeaksFinder</td>
-<td>内存泄漏检测</td>
-<td><a href="https://github.com/Tencent/MLeaksFinder" target="_blank" rel="noopener">https://github.com/Tencent/MLeaksFinder</a></td>
-</tr>
-<tr>
-<td>FBMemoryProfiler</td>
-<td>内存占用</td>
-<td><a href="https://github.com/facebook/FBMemoryProfiler" target="_blank" rel="noopener">https://github.com/facebook/FBMemoryProfiler</a></td>
-</tr>
-<tr>
-<td>CDFPS</td>
-<td>掉帧测试</td>
-<td></td>
-</tr>
-</tbody></table>
-<p>五、工具</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>名称介绍</th>
-<th>官网</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>KVOController</td>
-<td>属性监听</td>
-<td><a href="https://github.com/facebook/KVOController" target="_blank" rel="noopener">https://github.com/facebook/KVOController</a></td>
-</tr>
-<tr>
-<td>Aspects</td>
-<td>AOP切面编程</td>
-<td><a href="https://github.com/steipete/Aspects" target="_blank" rel="noopener">https://github.com/steipete/Aspects</a></td>
-</tr>
-<tr>
-<td>SAMKeychain</td>
-<td>钥匙串</td>
-<td><a href="https://github.com/soffes/SAMKeychain" target="_blank" rel="noopener">https://github.com/soffes/SAMKeychain</a></td>
-</tr>
-<tr>
-<td>CocoaLumberjack</td>
-<td>日志工具</td>
-<td><a href="https://github.com/CocoaLumberjack/CocoaLumberjack" target="_blank" rel="noopener">https://github.com/CocoaLumberjack/CocoaLumberjack</a></td>
-</tr>
-<tr>
-<td>WebViewJavascriptBridge</td>
-<td>js交互</td>
-<td><a href="https://github.com/marcuswestin/WebViewJavascriptBridge" target="_blank" rel="noopener">https://github.com/marcuswestin/WebViewJavascriptBridge</a></td>
-</tr>
-<tr>
-<td>IQKeyboardManager</td>
-<td>键盘管理</td>
-<td><a href="https://github.com/hackiftekhar/IQKeyboardManager" target="_blank" rel="noopener">https://github.com/hackiftekhar/IQKeyboardManager</a></td>
-</tr>
-<tr>
-<td>MJRefresh</td>
-<td>刷新</td>
-<td><a href="https://github.com/CoderMJLee/MJRefresh" target="_blank" rel="noopener">https://github.com/CoderMJLee/MJRefresh</a></td>
-</tr>
-<tr>
-<td>MBProgressHUD</td>
-<td>加载动画</td>
-<td><a href="https://github.com/jdg/MBProgressHUD" target="_blank" rel="noopener">https://github.com/jdg/MBProgressHUD</a></td>
-</tr>
-<tr>
-<td>SAMKeychain</td>
-<td>钥匙串</td>
-<td><a href="https://github.com/soffes/SAMKeychain" target="_blank" rel="noopener">https://github.com/soffes/SAMKeychain</a></td>
-</tr>
-</tbody></table>
-<p>六、UI</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>名称介绍</th>
-<th>官网</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>QMUI</td>
-<td>致力于提高项目 UI 开发效率的解决方案</td>
-<td><a href="http://qmuiteam.com/ios" target="_blank" rel="noopener">http://qmuiteam.com/ios</a></td>
-</tr>
-<tr>
-<td>YYKit</td>
-<td>YYKit is a collection of iOS components.</td>
-<td><a href="https://github.com/ibireme/YYKit" target="_blank" rel="noopener">https://github.com/ibireme/YYKit</a></td>
-</tr>
-<tr>
-<td>XLForm</td>
-<td>XLForm is the most flexible and powerful iOS library to create dynamic table-view forms. Fully compatible with Swift &amp; Obj-C</td>
-<td><a href="https://github.com/xmartlabs/XLForm" target="_blank" rel="noopener">https://github.com/xmartlabs/XLForm</a></td>
-</tr>
-</tbody></table>
-<p>七、音视频</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>名称介绍</th>
-<th>官网</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>AliyunVodPlayerSDK</td>
-<td>阿里云高级播放器</td>
-<td><a href="https://help.aliyun.com/document_detail/61668.html?spm=a2c4g.11174283.6.695.v2Pcei" target="_blank" rel="noopener">https://help.aliyun.com/document_detail/61668.html?spm=a2c4g.11174283.6.695.v2Pcei</a></td>
-</tr>
-<tr>
-<td>StreamingKit</td>
-<td>A fast and extensible gapless AudioPlayer/AudioStreamer for OSX and iOS (iPhone, iPad)</td>
-<td><a href="https://github.com/tumtumtum/StreamingKit" target="_blank" rel="noopener">https://github.com/tumtumtum/StreamingKit</a></td>
-</tr>
-<tr>
-<td>DOUAudioStreamer</td>
-<td>A Core Audio based streaming audio player for iOS and macOS</td>
-<td><a href="https://github.com/douban/DOUAudioStreamer" target="_blank" rel="noopener">https://github.com/douban/DOUAudioStreamer</a></td>
-</tr>
-</tbody></table>
-<p>八、支付</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>名称介绍</th>
-<th>官网</th>
-</tr>
-</thead>
-<tbody><tr>
-<td></td>
-<td>支付宝</td>
-<td><a href="https://docs.open.alipay.com/200" target="_blank" rel="noopener">https://docs.open.alipay.com/200</a></td>
-</tr>
-<tr>
-<td></td>
-<td>微信</td>
-<td><a href="https://pay.weixin.qq.com/wiki/doc/api/index.html" target="_blank" rel="noopener">https://pay.weixin.qq.com/wiki/doc/api/index.html</a></td>
-</tr>
-<tr>
-<td></td>
-<td>苹果内购</td>
-<td></td>
-</tr>
-</tbody></table>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/02/10/Block以及循环引用问题/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Haven">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Haven的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/10/Block以及循环引用问题/" itemprop="url">Block以及循环引用问题</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-10T13:40:05+08:00">
-                2018-02-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h5 id="引用一个问题-Block用什么修饰"><a href="#引用一个问题-Block用什么修饰" class="headerlink" title="引用一个问题, Block用什么修饰?"></a>引用一个问题, Block用什么修饰?</h5>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/02/10/Block以及循环引用问题/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1759,7 +1562,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-count">55</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

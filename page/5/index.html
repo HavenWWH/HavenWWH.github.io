@@ -262,6 +262,469 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/04/15/msgt基本框架/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Haven">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haven的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/15/msgt基本框架/" itemprop="url">msgt基本框架</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-15T18:22:35+08:00">
+                2018-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><strong>一、组织结构</strong></p>
+<p>FTProgramme</p>
+<p>├── AppDelegate – 继承 BHAppDelegate ， app 启动配置 BHAppDelegate，模块内配置各自的启动操作。</p>
+<p>├── MemoryCheck – facebook/FBMemoryProfiler, 可选内存检测，通过配置 FBMemoryProfiler 宏控制</p>
+<p>├── Router – 路由接口配置. url scheme 是 [mls]</p>
+<p>├── Animations – 动画配置</p>
+<p>├── CDThirdCode – 修改过源码的三方库</p>
+<p>├── ThirdLibrary – 三方库 framework/lib</p>
+<p>├── ThirdUI – 三方UI模板[QMUIKit]</p>
+<p>├── Utils – 工具类</p>
+<p>├── Manager – 管理类[数据存储、Base类、Define]</p>
+<p>├── Resource – 资源</p>
+<p>├── Moudles – 模块</p>
+<p>|    ├── Update – App升级模块</p>
+<p>|    ├── Main – App 主页面模块 [UITabBarController/IIViewDeckController]</p>
+<p>|    ├── Config – 项目配置模块</p>
+<p>|    ├── APNS – App推送模块</p>
+<p>|    ├──User –  用户管理模块，注册，登录，以及跟用户相关的内容</p>
+<p>|    ├── Pay–  支付模块</p>
+<p>|    └── Common – 公用模块</p>
+<p>二、架构</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>名称介绍</th>
+<th>官网</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BeeHive</td>
+<td>模块化编程</td>
+<td><a href="https://github.com/alibaba/BeeHive" target="_blank" rel="noopener">https://github.com/alibaba/BeeHive</a></td>
+</tr>
+<tr>
+<td>JLRoutes</td>
+<td>路由[模块解耦]</td>
+<td><a href="https://github.com/joeldev/JLRoutes" target="_blank" rel="noopener">https://github.com/joeldev/JLRoutes</a></td>
+</tr>
+</tbody></table>
+<p>三、网络</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>名称介绍</th>
+<th>官网</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>YTKNetwork</td>
+<td>网络框架</td>
+<td><a href="https://github.com/yuantiku/YTKNetwork" target="_blank" rel="noopener">https://github.com/yuantiku/YTKNetwork</a></td>
+</tr>
+<tr>
+<td>HLNetWorkReachability</td>
+<td>网络状态检测</td>
+<td><a href="https://github.com/Haley-Wong/HLNetWorkReachability" target="_blank" rel="noopener">https://github.com/Haley-Wong/HLNetWorkReachability</a></td>
+</tr>
+<tr>
+<td>GCDWebServer</td>
+<td>本地服务</td>
+<td><a href="https://github.com/swisspol/GCDWebServer" target="_blank" rel="noopener">https://github.com/swisspol/GCDWebServer</a></td>
+</tr>
+</tbody></table>
+<p>四、性能调试</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>名称介绍</th>
+<th>官网</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MLeaksFinder</td>
+<td>内存泄漏检测</td>
+<td><a href="https://github.com/Tencent/MLeaksFinder" target="_blank" rel="noopener">https://github.com/Tencent/MLeaksFinder</a></td>
+</tr>
+<tr>
+<td>FBMemoryProfiler</td>
+<td>内存占用</td>
+<td><a href="https://github.com/facebook/FBMemoryProfiler" target="_blank" rel="noopener">https://github.com/facebook/FBMemoryProfiler</a></td>
+</tr>
+<tr>
+<td>CDFPS</td>
+<td>掉帧测试</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>五、工具</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>名称介绍</th>
+<th>官网</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>KVOController</td>
+<td>属性监听</td>
+<td><a href="https://github.com/facebook/KVOController" target="_blank" rel="noopener">https://github.com/facebook/KVOController</a></td>
+</tr>
+<tr>
+<td>Aspects</td>
+<td>AOP切面编程</td>
+<td><a href="https://github.com/steipete/Aspects" target="_blank" rel="noopener">https://github.com/steipete/Aspects</a></td>
+</tr>
+<tr>
+<td>SAMKeychain</td>
+<td>钥匙串</td>
+<td><a href="https://github.com/soffes/SAMKeychain" target="_blank" rel="noopener">https://github.com/soffes/SAMKeychain</a></td>
+</tr>
+<tr>
+<td>CocoaLumberjack</td>
+<td>日志工具</td>
+<td><a href="https://github.com/CocoaLumberjack/CocoaLumberjack" target="_blank" rel="noopener">https://github.com/CocoaLumberjack/CocoaLumberjack</a></td>
+</tr>
+<tr>
+<td>WebViewJavascriptBridge</td>
+<td>js交互</td>
+<td><a href="https://github.com/marcuswestin/WebViewJavascriptBridge" target="_blank" rel="noopener">https://github.com/marcuswestin/WebViewJavascriptBridge</a></td>
+</tr>
+<tr>
+<td>IQKeyboardManager</td>
+<td>键盘管理</td>
+<td><a href="https://github.com/hackiftekhar/IQKeyboardManager" target="_blank" rel="noopener">https://github.com/hackiftekhar/IQKeyboardManager</a></td>
+</tr>
+<tr>
+<td>MJRefresh</td>
+<td>刷新</td>
+<td><a href="https://github.com/CoderMJLee/MJRefresh" target="_blank" rel="noopener">https://github.com/CoderMJLee/MJRefresh</a></td>
+</tr>
+<tr>
+<td>MBProgressHUD</td>
+<td>加载动画</td>
+<td><a href="https://github.com/jdg/MBProgressHUD" target="_blank" rel="noopener">https://github.com/jdg/MBProgressHUD</a></td>
+</tr>
+<tr>
+<td>SAMKeychain</td>
+<td>钥匙串</td>
+<td><a href="https://github.com/soffes/SAMKeychain" target="_blank" rel="noopener">https://github.com/soffes/SAMKeychain</a></td>
+</tr>
+</tbody></table>
+<p>六、UI</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>名称介绍</th>
+<th>官网</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>QMUI</td>
+<td>致力于提高项目 UI 开发效率的解决方案</td>
+<td><a href="http://qmuiteam.com/ios" target="_blank" rel="noopener">http://qmuiteam.com/ios</a></td>
+</tr>
+<tr>
+<td>YYKit</td>
+<td>YYKit is a collection of iOS components.</td>
+<td><a href="https://github.com/ibireme/YYKit" target="_blank" rel="noopener">https://github.com/ibireme/YYKit</a></td>
+</tr>
+<tr>
+<td>XLForm</td>
+<td>XLForm is the most flexible and powerful iOS library to create dynamic table-view forms. Fully compatible with Swift &amp; Obj-C</td>
+<td><a href="https://github.com/xmartlabs/XLForm" target="_blank" rel="noopener">https://github.com/xmartlabs/XLForm</a></td>
+</tr>
+</tbody></table>
+<p>七、音视频</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>名称介绍</th>
+<th>官网</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AliyunVodPlayerSDK</td>
+<td>阿里云高级播放器</td>
+<td><a href="https://help.aliyun.com/document_detail/61668.html?spm=a2c4g.11174283.6.695.v2Pcei" target="_blank" rel="noopener">https://help.aliyun.com/document_detail/61668.html?spm=a2c4g.11174283.6.695.v2Pcei</a></td>
+</tr>
+<tr>
+<td>StreamingKit</td>
+<td>A fast and extensible gapless AudioPlayer/AudioStreamer for OSX and iOS (iPhone, iPad)</td>
+<td><a href="https://github.com/tumtumtum/StreamingKit" target="_blank" rel="noopener">https://github.com/tumtumtum/StreamingKit</a></td>
+</tr>
+<tr>
+<td>DOUAudioStreamer</td>
+<td>A Core Audio based streaming audio player for iOS and macOS</td>
+<td><a href="https://github.com/douban/DOUAudioStreamer" target="_blank" rel="noopener">https://github.com/douban/DOUAudioStreamer</a></td>
+</tr>
+</tbody></table>
+<p>八、支付</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>名称介绍</th>
+<th>官网</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td>支付宝</td>
+<td><a href="https://docs.open.alipay.com/200" target="_blank" rel="noopener">https://docs.open.alipay.com/200</a></td>
+</tr>
+<tr>
+<td></td>
+<td>微信</td>
+<td><a href="https://pay.weixin.qq.com/wiki/doc/api/index.html" target="_blank" rel="noopener">https://pay.weixin.qq.com/wiki/doc/api/index.html</a></td>
+</tr>
+<tr>
+<td></td>
+<td>苹果内购</td>
+<td></td>
+</tr>
+</tbody></table>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/02/10/Block以及循环引用问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Haven">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haven的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/10/Block以及循环引用问题/" itemprop="url">Block以及循环引用问题</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-10T13:40:05+08:00">
+                2018-02-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h5 id="引用一个问题-Block用什么修饰"><a href="#引用一个问题-Block用什么修饰" class="headerlink" title="引用一个问题, Block用什么修饰?"></a>引用一个问题, Block用什么修饰?</h5>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/02/10/Block以及循环引用问题/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2018/02/05/FOUNDATION_EXTERN等关键字/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1243,255 +1706,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/10/10/iOS签名认证过程/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Haven">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Haven的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/10/iOS签名认证过程/" itemprop="url">iOS签名认证过程</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-10T22:23:05+08:00">
-                2017-10-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <ol>
-<li><p>keychain里的“从证书颁发机构请求证书”，Mac上生成一对公私钥, CertificateSigningRequest(公钥L) , Mac上还有一份私钥L存在本地</p></li></ol>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/10/10/iOS签名认证过程/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://HavenWWH.github.io/2017/09/01/removeFromSuperview详解/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Haven">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/onepeice-avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Haven的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/09/01/removeFromSuperview详解/" itemprop="url">removeFromSuperview详解</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-01T11:04:01+08:00">
-                2017-09-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h4 id="removeFromSuperview"><a href="#removeFromSuperview" class="headerlink" title="removeFromSuperview"></a>removeFromSuperview</h4><p>苹果官方文档说明: 从当前视图的父视图和窗口中移除,同时从响应事件的响应者链中移除</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/09/01/removeFromSuperview详解/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1544,7 +1758,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-count">55</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
