@@ -240,6 +240,146 @@
 </nav>
       <div class="body-wrap">
   
+    <article id="post-Block原理以及循环引用问题" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2020/06/12/Block%E5%8E%9F%E7%90%86%E4%BB%A5%E5%8F%8A%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8%E9%97%AE%E9%A2%98/" class="article-date">
+      <time datetime="2020-06-12T04:12:22.000Z" itemprop="datePublished">2020-06-12</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a  class="article-title" href="/2020/06/12/Block%E5%8E%9F%E7%90%86%E4%BB%A5%E5%8F%8A%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8%E9%97%AE%E9%A2%98/">Block原理以及循环引用问题</a>
+    </h1>
+  
+
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <p>Block是什么?<br>block本质上是一个OC对象(将函数执行上下文封装起来的对象),它内部也有isa指针，这个对象封装了函数调用地址以及函数调用环境(函数参数、返回值、捕获的外部变量等)</p>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/iOS/">iOS</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Block/" rel="tag">Block</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8/" rel="tag">循环引用</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a   href="/2020/06/12/Block%E5%8E%9F%E7%90%86%E4%BB%A5%E5%8F%8A%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8%E9%97%AE%E9%A2%98/#more">查看更多 >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-FOUNDATION_EXTERN,UIKIT_EXTERN,#define,static关键字" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2020/05/15/FOUNDATION_EXTERN,UIKIT_EXTERN,#define,static%E5%85%B3%E9%94%AE%E5%AD%97/" class="article-date">
+      <time datetime="2020-05-15T14:20:15.000Z" itemprop="datePublished">2020-05-15</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a  class="article-title" href="/2020/05/15/FOUNDATION_EXTERN,UIKIT_EXTERN,#define,static%E5%85%B3%E9%94%AE%E5%AD%97/">FOUNDATION_EXTERN,UIKIT_EXTERN,#define,static关键字</a>
+    </h1>
+  
+
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <h3 id="extern"><a href="#extern" class="headerlink" title="extern"></a>extern</h3><p>用 extern 声明外部全局变量，并不是定义一个变量，只会初始化一次, 该关键字告诉编译器，其声明的函数或变量可以在本模块或者其他模块中使用, 会在链接阶段生成的目标代码中找到此变量,FOUNDATION_EXTERN,UIKIT_EXTERN都是基于extern,所以FOUNDATION_EXTERN,UIKIT_EXTERN, extern用法其实都一样, 只是看是否兼容C++</p>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/iOS/">iOS</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="tag">知识点</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a   href="/2020/05/15/FOUNDATION_EXTERN,UIKIT_EXTERN,#define,static%E5%85%B3%E9%94%AE%E5%AD%97/#more">查看更多 >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
+
+
+  
     <article id="post-OC中weak的理解" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
@@ -780,146 +920,6 @@
       
         <p class="article-more-link">
           <a   href="/2019/12/08/removeFromSuperview%E8%AF%A6%E8%A7%A3/#more">查看更多 >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-iOS响应链之事件传递和响应" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a  href="/2019/12/01/iOS%E5%93%8D%E5%BA%94%E9%93%BE%E4%B9%8B%E4%BA%8B%E4%BB%B6%E4%BC%A0%E9%80%92%E5%92%8C%E5%93%8D%E5%BA%94/" class="article-date">
-      <time datetime="2019-12-01T01:22:15.000Z" itemprop="datePublished">2019-12-01</time>
-</a>
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a  class="article-title" href="/2019/12/01/iOS%E5%93%8D%E5%BA%94%E9%93%BE%E4%B9%8B%E4%BA%8B%E4%BB%B6%E4%BC%A0%E9%80%92%E5%92%8C%E5%93%8D%E5%BA%94/">iOS响应链之事件传递和响应</a>
-    </h1>
-  
-
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <p>iOS事件有触摸事件,运动事件,远程事件, 这里特指触摸事件, 也就是平时项目中遇到最多的情况, 每一个触摸事件都是需要有传递和响应两个过程的, 传递事件是为了找出最合适的View, 响应事件是为了找出能响应此事件的View(最合适的View不一定就能响应此事件)</p>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-    <div class="article-category tagcloud">
-    <a class="article-category-link" href="/categories/iOS/">iOS</a>
-    </div>
-
-
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%93%8D%E5%BA%94%E9%93%BE/" rel="tag">响应链</a></li></ul>
-    </div>
-
-      
-        <p class="article-more-link">
-          <a   href="/2019/12/01/iOS%E5%93%8D%E5%BA%94%E9%93%BE%E4%B9%8B%E4%BA%8B%E4%BB%B6%E4%BC%A0%E9%80%92%E5%92%8C%E5%93%8D%E5%BA%94/#more">查看更多 >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-iOSView的生命周期" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a  href="/2019/10/17/iOSView%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" class="article-date">
-      <time datetime="2019-10-17T11:23:25.000Z" itemprop="datePublished">2019-10-17</time>
-</a>
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a  class="article-title" href="/2019/10/17/iOSView%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/">iOSView的生命周期</a>
-    </h1>
-  
-
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <p>iOSView的生命周期</p>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-    <div class="article-category tagcloud">
-    <a class="article-category-link" href="/categories/iOS/">iOS</a>
-    </div>
-
-
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" rel="tag">生命周期</a></li></ul>
-    </div>
-
-      
-        <p class="article-more-link">
-          <a   href="/2019/10/17/iOSView%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/#more">查看更多 >></a>
         </p>
       
       <div class="clearfix"></div>
