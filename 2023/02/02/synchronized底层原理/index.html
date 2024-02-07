@@ -9,12 +9,12 @@
   
   <title>synchronized底层原理 | Haven的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="synchronizediOS中称为同步锁, 也叫对象锁,  底层实质是递归锁, 是对recursive_mutex_t做了封装和处理, 其内部维护了一张表用来存储对象和锁的相关信息，加锁和释放锁的操作就是对锁的计数进行操作 针对一个Person类的run方法进行加锁 12345- (void)run &amp;#123;    @synchronized (self) &amp;#123;        NS">
+  <meta name="description" content="synchronizediOS中称为同步锁, 也叫对象锁,  底层实质是递归锁, 是对recursive_mutex_t做了封装和处理, 其内部维护了一张表用来存储对象和锁的相关信息，加锁和释放锁的操作就是对锁的计数进行操作">
 <meta property="og:type" content="article">
 <meta property="og:title" content="synchronized底层原理">
 <meta property="og:url" content="https://havenwwh.github.io/2023/02/02/synchronized%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/index.html">
 <meta property="og:site_name" content="Haven的博客">
-<meta property="og:description" content="synchronizediOS中称为同步锁, 也叫对象锁,  底层实质是递归锁, 是对recursive_mutex_t做了封装和处理, 其内部维护了一张表用来存储对象和锁的相关信息，加锁和释放锁的操作就是对锁的计数进行操作 针对一个Person类的run方法进行加锁 12345- (void)run &amp;#123;    @synchronized (self) &amp;#123;        NS">
+<meta property="og:description" content="synchronizediOS中称为同步锁, 也叫对象锁,  底层实质是递归锁, 是对recursive_mutex_t做了封装和处理, 其内部维护了一张表用来存储对象和锁的相关信息，加锁和释放锁的操作就是对锁的计数进行操作">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-02-02T12:10:31.000Z">
 <meta property="article:modified_time" content="2023-02-02T12:10:31.000Z">
@@ -284,8 +284,8 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <span id="more"></span>
-<h4 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h4><p>iOS中称为同步锁, 也叫对象锁,  底层实质是递归锁, 是对recursive_mutex_t做了封装和处理, 其内部维护了一张表用来存储对象和锁的相关信息，加锁和释放锁的操作就是对锁的计数进行操作</p>
+        <h4 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h4><p>iOS中称为同步锁, 也叫对象锁,  底层实质是递归锁, 是对recursive_mutex_t做了封装和处理, 其内部维护了一张表用来存储对象和锁的相关信息，加锁和释放锁的操作就是对锁的计数进行操作</p>
+<span id="more"></span>
 <p>针对一个Person类的run方法进行加锁</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- (void)run &#123;</span><br><span class="line">    @synchronized (self) &#123;</span><br><span class="line">        NSLog(@&quot;&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 

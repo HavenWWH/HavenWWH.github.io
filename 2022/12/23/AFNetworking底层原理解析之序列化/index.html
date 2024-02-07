@@ -9,12 +9,12 @@
   
   <title>AFNetworking底层原理解析之序列化 | Haven的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="AFURLRequestSerialization请求的序列化查看AFURLRequestSerialization的头文件中，实现了AFURLRequestSerialization协议，协议中只有一个方法 1- (nullable NSURLRequest *)requestBySerializingRequest:(NSURLRequest *)request withParameters">
+  <meta name="description" content="AFURLRequestSerialization请求的序列化">
 <meta property="og:type" content="article">
 <meta property="og:title" content="AFNetworking底层原理解析之序列化">
 <meta property="og:url" content="https://havenwwh.github.io/2022/12/23/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E5%BA%8F%E5%88%97%E5%8C%96/index.html">
 <meta property="og:site_name" content="Haven的博客">
-<meta property="og:description" content="AFURLRequestSerialization请求的序列化查看AFURLRequestSerialization的头文件中，实现了AFURLRequestSerialization协议，协议中只有一个方法 1- (nullable NSURLRequest *)requestBySerializingRequest:(NSURLRequest *)request withParameters">
+<meta property="og:description" content="AFURLRequestSerialization请求的序列化">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-12-23T14:10:31.000Z">
 <meta property="article:modified_time" content="2022-12-23T14:10:31.000Z">
@@ -285,8 +285,9 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <span id="more"></span>
-<h4 id="AFURLRequestSerialization"><a href="#AFURLRequestSerialization" class="headerlink" title="AFURLRequestSerialization"></a>AFURLRequestSerialization</h4><p>请求的序列化<br>查看AFURLRequestSerialization的头文件中，实现了AFURLRequestSerialization协议，协议中只有一个方法</p>
+        <h4 id="AFURLRequestSerialization"><a href="#AFURLRequestSerialization" class="headerlink" title="AFURLRequestSerialization"></a>AFURLRequestSerialization</h4><p>请求的序列化</p>
+<span id="more"></span>
+<p>查看AFURLRequestSerialization的头文件中，实现了AFURLRequestSerialization协议，协议中只有一个方法</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (nullable NSURLRequest *)requestBySerializingRequest:(NSURLRequest *)request withParameters:(nullable id)parameters error:(NSError * _Nullable __autoreleasing *)error NS_SWIFT_NOTHROW;</span><br></pre></td></tr></table></figure>
 <p>用于返回一个原始request的copy对象，将参数根据指定的编码格式进行处理。<br> AFHTTPRequestSerializer作为请求序列化的一个根类，作为AFN的默认设置。AFJSONRequestSerializer、AFPropertyListRequestSerializer作为子类都继承自AFHTTPRequestSerializer。<br> 头文件中还存在AFMultipartFormData协议，主要用于多部分表单的处理，之后将以表单形式POST请求为例，来分析其中的工作流程。<br> AFURLRequestSerialization协议，继承自&lt;NSObject, NSSecureCoding, NSCopying&gt;三个协议。其中NSSecureCoding协议，主要用于在解码时要同时指定key和要解码的对象的类，如果要求的类和从文件中解码出的对象的类不匹配，NSCoder则会抛出异常并通知数据已经被篡改。NSCopying协议是为了能够让当前类支持拷贝功能。<br> 以POST请求为例，提交的数据都是放到请求体body中，但并未规定编码方式，那么就需要设置Content-Type告知后台服务<br>简单基本的网络请求过程，之前已经介绍过。在实际开发中避免不了与后台大文件传输，那么就要将上传或下载的大文件以数据流的形式进行传输。此时就需要用到AFN框架中的</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (NSURLSessionDataTask *)POST:(NSString *)URLString parameters:(id)parameters constructingBodyWithBlock:(void (^)(id &lt;AFMultipartFormData&gt; formData))block progress:(nullable void (^)(NSProgress * _Nonnull))uploadProgress success:(void (^)(NSURLSessionDataTask *task, id responseObject))success failure:(void (^)(NSURLSessionDataTask *task, NSError *error))failure</span><br></pre></td></tr></table></figure>
