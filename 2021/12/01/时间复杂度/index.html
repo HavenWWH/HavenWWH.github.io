@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl"/>
+  
+  
+  
+  
+  <title>时间复杂度 | Haven的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简单记录一下事件复杂度的理解, 参考网上的文章">
+<meta property="og:type" content="article">
+<meta property="og:title" content="时间复杂度">
+<meta property="og:url" content="https://havenwwh.github.io/2021/12/01/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/index.html">
+<meta property="og:site_name" content="Haven的博客">
+<meta property="og:description" content="简单记录一下事件复杂度的理解, 参考网上的文章">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-12-01T02:28:22.000Z">
+<meta property="article:modified_time" content="2021-12-01T02:28:22.000Z">
+<meta property="article:author" content="Haven">
+<meta property="article:tag" content="时间复杂度">
+<meta property="article:tag" content="O(n)">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.png" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Haven</a></h1>
+        </hgroup>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">主页</a></li>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/tags">标签</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/HavenWWH" title="github">github</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Block/" style="font-size: 11.43px;">Block</a> <a href="/tags/Category/" style="font-size: 10px;">Category</a> <a href="/tags/Deadlock/" style="font-size: 10px;">Deadlock</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Https/" style="font-size: 10px;">Https</a> <a href="/tags/KVC/" style="font-size: 10px;">KVC</a> <a href="/tags/KVO/" style="font-size: 10px;">KVO</a> <a href="/tags/O-n/" style="font-size: 10px;">O(n)</a> <a href="/tags/Rumtime/" style="font-size: 10px;">Rumtime</a> <a href="/tags/RunLoop/" style="font-size: 10px;">RunLoop</a> <a href="/tags/Runtime/" style="font-size: 15.71px;">Runtime</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/git/" style="font-size: 11.43px;">git</a> <a href="/tags/%E4%BB%A3%E7%90%86/" style="font-size: 10px;">代理</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/" style="font-size: 10px;">代码规范</a> <a href="/tags/%E5%83%8F%E7%B4%A0/" style="font-size: 10px;">像素</a> <a href="/tags/%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0/" style="font-size: 10px;">内联函数</a> <a href="/tags/%E5%87%BD%E6%95%B0%E7%9A%84%E8%B0%83%E7%94%A8/" style="font-size: 10px;">函数的调用</a> <a href="/tags/%E5%88%86%E7%B1%BB/" style="font-size: 10px;">分类</a> <a href="/tags/%E5%8A%9F%E8%83%BD%E7%82%B9/" style="font-size: 11.43px;">功能点</a> <a href="/tags/%E5%8D%8F%E8%AE%AE/" style="font-size: 17.14px;">协议</a> <a href="/tags/%E5%8E%9F%E7%90%86/" style="font-size: 18.57px;">原理</a> <a href="/tags/%E5%91%BD%E4%BB%A4/" style="font-size: 10px;">命令</a> <a href="/tags/%E5%93%8D%E5%BA%94%E9%93%BE/" style="font-size: 10px;">响应链</a> <a href="/tags/%E5%9B%BE%E7%89%87/" style="font-size: 12.86px;">图片</a> <a href="/tags/%E5%9F%BA%E7%A1%80/" style="font-size: 12.86px;">基础</a> <a href="/tags/%E5%B8%B8%E8%AF%86/" style="font-size: 10px;">常识</a> <a href="/tags/%E5%BA%95%E5%B1%82/" style="font-size: 10px;">底层</a> <a href="/tags/%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8/" style="font-size: 10px;">循环引用</a> <a href="/tags/%E6%8E%A8%E9%80%81/" style="font-size: 10px;">推送</a> <a href="/tags/%E6%8F%92%E4%BB%B6%E9%AA%8C%E8%AF%81/" style="font-size: 10px;">插件验证</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 10px;">数据库</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 10px;">数据结构</a> <a href="/tags/%E6%97%A5%E5%B8%B8%E8%B8%A9%E5%9D%91/" style="font-size: 11.43px;">日常踩坑</a> <a href="/tags/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" style="font-size: 10px;">时间复杂度</a> <a href="/tags/%E6%9C%AC%E5%9C%B0%E5%8C%96%E5%AD%98%E5%82%A8/" style="font-size: 10px;">本地化存储</a> <a href="/tags/%E6%A1%86%E6%9E%B6/" style="font-size: 10px;">框架</a> <a href="/tags/%E6%B6%88%E6%81%AF/" style="font-size: 14.29px;">消息</a> <a href="/tags/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" style="font-size: 10px;">生命周期</a> <a href="/tags/%E7%9F%A5%E8%AF%86%E7%82%B9/" style="font-size: 20px;">知识点</a> <a href="/tags/%E7%A7%81%E6%9C%89%E5%BA%93/" style="font-size: 11.43px;">私有库</a> <a href="/tags/%E7%AD%BE%E5%90%8D%E8%AE%A4%E8%AF%81/" style="font-size: 10px;">签名认证</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 11.43px;">算法</a> <a href="/tags/%E7%BA%BF%E7%A8%8B/" style="font-size: 12.86px;">线程</a> <a href="/tags/%E7%BB%84%E4%BB%B6%E5%8C%96/" style="font-size: 12.86px;">组件化</a> <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85/" style="font-size: 10px;">自动化打包</a> <a href="/tags/%E8%AF%81%E4%B9%A6/" style="font-size: 10px;">证书</a> <a href="/tags/%E8%B5%84%E6%BA%90%E4%B8%8B%E8%BD%BD/" style="font-size: 10px;">资源下载</a> <a href="/tags/%E8%B8%A9%E5%9D%91%E6%97%A5%E5%B8%B8/" style="font-size: 10px;">踩坑日常</a> <a href="/tags/%E9%80%82%E9%85%8D/" style="font-size: 11.43px;">适配</a> <a href="/tags/%E9%80%9A%E7%9F%A5/" style="font-size: 10px;">通知</a> <a href="/tags/%E9%93%BE%E6%8E%A5%E8%B7%B3%E8%BD%AC/" style="font-size: 10px;">链接跳转</a> <a href="/tags/%E9%94%81/" style="font-size: 10px;">锁</a>
+                    </div>
+                </section>
+                
+                
+                
+                
+                <section class="switch-part switch-part3">
+                
+                    <div id="js-aboutme">爱好很多的程序员</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Haven</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.png" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Haven</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags">标签</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/HavenWWH" title="github">github</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-时间复杂度" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2021/12/01/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" class="article-date">
+      <time datetime="2021-12-01T02:28:22.000Z" itemprop="datePublished">2021-12-01</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      时间复杂度
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/O-n/" rel="tag">O(n)</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" rel="tag">时间复杂度</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>简单记录一下事件复杂度的理解, 参考网上的文章</p>
+<span id="more"></span>
+
+<h4 id="场景1-一条长N寸的面包，小灰每3天吃掉1寸，那么吃掉整个面包需要几天？"><a href="#场景1-一条长N寸的面包，小灰每3天吃掉1寸，那么吃掉整个面包需要几天？" class="headerlink" title="场景1: 一条长N寸的面包，小灰每3天吃掉1寸，那么吃掉整个面包需要几天？"></a>场景1: 一条长N寸的面包，小灰每3天吃掉1寸，那么吃掉整个面包需要几天？</h4><p>吃掉整个面包，需要 3 X n = 3n 天。<br>如果用一个函数来表达这个相对时间，可以记作 T（n） = 3n<br>执行方式:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for(int i=0; i&lt;n; i++)&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="场景2-给小灰一条长N寸的面包，小灰每5天吃掉面包剩余长度的一半，第一次吃掉8寸，第二次吃掉4寸，第三次吃掉2寸……那么小灰把面包吃得只剩下1寸，需要多少天呢"><a href="#场景2-给小灰一条长N寸的面包，小灰每5天吃掉面包剩余长度的一半，第一次吃掉8寸，第二次吃掉4寸，第三次吃掉2寸……那么小灰把面包吃得只剩下1寸，需要多少天呢" class="headerlink" title="场景2: 给小灰一条长N寸的面包，小灰每5天吃掉面包剩余长度的一半，第一次吃掉8寸，第二次吃掉4寸，第三次吃掉2寸……那么小灰把面包吃得只剩下1寸，需要多少天呢?"></a>场景2: 给小灰一条长N寸的面包，小灰每5天吃掉面包剩余长度的一半，第一次吃掉8寸，第二次吃掉4寸，第三次吃掉2寸……那么小灰把面包吃得只剩下1寸，需要多少天呢?</h4><p>数字N不断地除以2，除几次以后的结果等于1？涉及到数学当中的对数，以2位底，16为真数的对数，可以简写为log16</p>
+<p>吃掉整个面包，需要5 X logn = 5logn天。<br>如果用一个函数来表达这个相对时间，可以记作 T（n） = 5logn</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for(int i=1; i&lt;n; i*=2)&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="场景3：一个10寸的面包和一个鸡腿，小灰每2天吃掉一个鸡腿。那么小灰吃掉整个鸡腿需要多少天呢？"><a href="#场景3：一个10寸的面包和一个鸡腿，小灰每2天吃掉一个鸡腿。那么小灰吃掉整个鸡腿需要多少天呢？" class="headerlink" title="场景3：一个10寸的面包和一个鸡腿，小灰每2天吃掉一个鸡腿。那么小灰吃掉整个鸡腿需要多少天呢？"></a>场景3：一个10寸的面包和一个鸡腿，小灰每2天吃掉一个鸡腿。那么小灰吃掉整个鸡腿需要多少天呢？</h4><p>如果用一个函数来表达这个相对时间，可以记作 T（n） = 2</p>
+<h4 id="场景4：给小灰一条长N寸的面包，小灰吃掉第一个一寸需要1天时间，吃掉第二个一寸需要2天时间，吃掉第三个一寸需要3天时间…-每多吃一寸，所花的时间也多一天。那么小灰吃掉整个面包需要多少天呢？"><a href="#场景4：给小灰一条长N寸的面包，小灰吃掉第一个一寸需要1天时间，吃掉第二个一寸需要2天时间，吃掉第三个一寸需要3天时间…-每多吃一寸，所花的时间也多一天。那么小灰吃掉整个面包需要多少天呢？" class="headerlink" title="场景4：给小灰一条长N寸的面包，小灰吃掉第一个一寸需要1天时间，吃掉第二个一寸需要2天时间，吃掉第三个一寸需要3天时间…..每多吃一寸，所花的时间也多一天。那么小灰吃掉整个面包需要多少天呢？"></a>场景4：给小灰一条长N寸的面包，小灰吃掉第一个一寸需要1天时间，吃掉第二个一寸需要2天时间，吃掉第三个一寸需要3天时间…..每多吃一寸，所花的时间也多一天。那么小灰吃掉整个面包需要多少天呢？</h4><p>此时吃掉整个面包，需要 1+2+3+……+ n-1 + n = (1+n)*n/2 = 0.5n^2 + 0.5n。<br>记作 如果用一个函数来表达这个相对时间，可以记作T（n） = 0.5n^2 + 0.5n</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">for(int i=1; i&lt;n; i++)&#123;</span><br><span class="line">    for(int j=0; j&lt;i; j++)&#123;</span><br><span class="line">        </span><br><span class="line">    &#125;      </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="什么是时间复杂度"><a href="#什么是时间复杂度" class="headerlink" title="什么是时间复杂度"></a>什么是时间复杂度</h4><p>若存在函数 f（n），使得当n趋近于无穷大时，T（n）/ f（n）的极限值为不等于零的常数，则称 f（n）是T（n）的同数量级函数。<br>记作 T（n）= O（f（n）），称O（f（n）） 为算法的渐进时间复杂度，简称时间复杂度<br>渐进时间复杂度用大写O来表示，所以也被称为大O表示法</p>
+<h4 id="如何推导出时间复杂度呢？"><a href="#如何推导出时间复杂度呢？" class="headerlink" title="如何推导出时间复杂度呢？"></a>如何推导出时间复杂度呢？</h4><p>如下几个原则：</p>
+<ul>
+<li><p>如果运行时间是常数量级，用常数1表示；</p>
+</li>
+<li><p>只保留时间函数中的最高阶项；</p>
+</li>
+<li><p>如果最高阶项存在，则省去最高阶项前面的系数。</p>
+</li>
+</ul>
+<p>所以上面四个场景的时间复杂度分别是:<br>T（n） =  O（n）</p>
+<p>T（n） =  O（logn）</p>
+<p>T（n） =  O（1）</p>
+<p>T（n） =  O（n^2）</p>
+<p>这四种时间复杂度究竟谁用时更长比较</p>
+<p>O（1）&lt; O（logn）&lt; O（n）&lt; O（n^2）</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2021/12/01/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/">时间复杂度</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Haven 的个人博客">Haven</a></p>
+        <p><span>发布时间:</span>2021年12月01日 - 10时28分</p>
+        <p><span>最后更新:</span>2021年12月01日 - 10时28分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2021/12/01/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" title="时间复杂度">https://havenwwh.github.io/2021/12/01/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://havenwwh.github.io/2021/12/01/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/　　作者: Haven" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a  href="/2021/12/29/%E9%93%B6%E8%A1%8C%E5%AE%B6%E7%AE%97%E6%B3%95/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          银行家算法
+        
+      </div>
+    </a>
+  
+  
+    <a  href="/2021/11/15/iOS%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">iOS内存管理</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF1-%E4%B8%80%E6%9D%A1%E9%95%BFN%E5%AF%B8%E7%9A%84%E9%9D%A2%E5%8C%85%EF%BC%8C%E5%B0%8F%E7%81%B0%E6%AF%8F3%E5%A4%A9%E5%90%83%E6%8E%891%E5%AF%B8%EF%BC%8C%E9%82%A3%E4%B9%88%E5%90%83%E6%8E%89%E6%95%B4%E4%B8%AA%E9%9D%A2%E5%8C%85%E9%9C%80%E8%A6%81%E5%87%A0%E5%A4%A9%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">场景1: 一条长N寸的面包，小灰每3天吃掉1寸，那么吃掉整个面包需要几天？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF2-%E7%BB%99%E5%B0%8F%E7%81%B0%E4%B8%80%E6%9D%A1%E9%95%BFN%E5%AF%B8%E7%9A%84%E9%9D%A2%E5%8C%85%EF%BC%8C%E5%B0%8F%E7%81%B0%E6%AF%8F5%E5%A4%A9%E5%90%83%E6%8E%89%E9%9D%A2%E5%8C%85%E5%89%A9%E4%BD%99%E9%95%BF%E5%BA%A6%E7%9A%84%E4%B8%80%E5%8D%8A%EF%BC%8C%E7%AC%AC%E4%B8%80%E6%AC%A1%E5%90%83%E6%8E%898%E5%AF%B8%EF%BC%8C%E7%AC%AC%E4%BA%8C%E6%AC%A1%E5%90%83%E6%8E%894%E5%AF%B8%EF%BC%8C%E7%AC%AC%E4%B8%89%E6%AC%A1%E5%90%83%E6%8E%892%E5%AF%B8%E2%80%A6%E2%80%A6%E9%82%A3%E4%B9%88%E5%B0%8F%E7%81%B0%E6%8A%8A%E9%9D%A2%E5%8C%85%E5%90%83%E5%BE%97%E5%8F%AA%E5%89%A9%E4%B8%8B1%E5%AF%B8%EF%BC%8C%E9%9C%80%E8%A6%81%E5%A4%9A%E5%B0%91%E5%A4%A9%E5%91%A2"><span class="toc-number">2.</span> <span class="toc-text">场景2: 给小灰一条长N寸的面包，小灰每5天吃掉面包剩余长度的一半，第一次吃掉8寸，第二次吃掉4寸，第三次吃掉2寸……那么小灰把面包吃得只剩下1寸，需要多少天呢?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF3%EF%BC%9A%E4%B8%80%E4%B8%AA10%E5%AF%B8%E7%9A%84%E9%9D%A2%E5%8C%85%E5%92%8C%E4%B8%80%E4%B8%AA%E9%B8%A1%E8%85%BF%EF%BC%8C%E5%B0%8F%E7%81%B0%E6%AF%8F2%E5%A4%A9%E5%90%83%E6%8E%89%E4%B8%80%E4%B8%AA%E9%B8%A1%E8%85%BF%E3%80%82%E9%82%A3%E4%B9%88%E5%B0%8F%E7%81%B0%E5%90%83%E6%8E%89%E6%95%B4%E4%B8%AA%E9%B8%A1%E8%85%BF%E9%9C%80%E8%A6%81%E5%A4%9A%E5%B0%91%E5%A4%A9%E5%91%A2%EF%BC%9F"><span class="toc-number">3.</span> <span class="toc-text">场景3：一个10寸的面包和一个鸡腿，小灰每2天吃掉一个鸡腿。那么小灰吃掉整个鸡腿需要多少天呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF4%EF%BC%9A%E7%BB%99%E5%B0%8F%E7%81%B0%E4%B8%80%E6%9D%A1%E9%95%BFN%E5%AF%B8%E7%9A%84%E9%9D%A2%E5%8C%85%EF%BC%8C%E5%B0%8F%E7%81%B0%E5%90%83%E6%8E%89%E7%AC%AC%E4%B8%80%E4%B8%AA%E4%B8%80%E5%AF%B8%E9%9C%80%E8%A6%811%E5%A4%A9%E6%97%B6%E9%97%B4%EF%BC%8C%E5%90%83%E6%8E%89%E7%AC%AC%E4%BA%8C%E4%B8%AA%E4%B8%80%E5%AF%B8%E9%9C%80%E8%A6%812%E5%A4%A9%E6%97%B6%E9%97%B4%EF%BC%8C%E5%90%83%E6%8E%89%E7%AC%AC%E4%B8%89%E4%B8%AA%E4%B8%80%E5%AF%B8%E9%9C%80%E8%A6%813%E5%A4%A9%E6%97%B6%E9%97%B4%E2%80%A6-%E6%AF%8F%E5%A4%9A%E5%90%83%E4%B8%80%E5%AF%B8%EF%BC%8C%E6%89%80%E8%8A%B1%E7%9A%84%E6%97%B6%E9%97%B4%E4%B9%9F%E5%A4%9A%E4%B8%80%E5%A4%A9%E3%80%82%E9%82%A3%E4%B9%88%E5%B0%8F%E7%81%B0%E5%90%83%E6%8E%89%E6%95%B4%E4%B8%AA%E9%9D%A2%E5%8C%85%E9%9C%80%E8%A6%81%E5%A4%9A%E5%B0%91%E5%A4%A9%E5%91%A2%EF%BC%9F"><span class="toc-number">4.</span> <span class="toc-text">场景4：给小灰一条长N寸的面包，小灰吃掉第一个一寸需要1天时间，吃掉第二个一寸需要2天时间，吃掉第三个一寸需要3天时间…..每多吃一寸，所花的时间也多一天。那么小灰吃掉整个面包需要多少天呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="toc-number">5.</span> <span class="toc-text">什么是时间复杂度</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E6%8E%A8%E5%AF%BC%E5%87%BA%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%91%A2%EF%BC%9F"><span class="toc-number">6.</span> <span class="toc-text">如何推导出时间复杂度呢？</span></a></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: '',
+      conf: ''
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/2021/12/29/%E9%93%B6%E8%A1%8C%E5%AE%B6%E7%AE%97%E6%B3%95/" title="上一篇: 银行家算法">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/2021/11/15/iOS%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" title="下一篇: iOS内存管理">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2022/12/29/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8BAFSecurityPolicy/">AFNetworking底层原理解析之AFSecurityPolicy.md</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/12/23/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E5%BA%8F%E5%88%97%E5%8C%96/">AFNetworking底层原理解析之序列化.md</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/12/03/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B/">AFNetworking底层原理解析之请求流程.md</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/09/14/%E6%9C%AC%E5%9C%B0%E8%B5%84%E6%BA%90%E5%8C%85%E4%B8%8B%E8%BD%BD%E6%9B%B4%E6%96%B0%E6%9C%BA%E5%88%B6/">本地资源包下载更新机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/08/15/%E9%A1%B9%E7%9B%AE%E7%BB%84%E4%BB%B6%E5%8C%96%E6%B7%BB%E5%8A%A0%E6%A8%A1%E5%9D%97/">项目组件化添加模块</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/08/11/LaunchScreen/">LaunchScreen</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/07/08/Https%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B/">Https四次握手</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/07/08/NSURLComponents/">NSURLComponents</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/07/03/appStore%E5%AE%A1%E6%A0%B8%E8%B8%A9%E5%9D%91%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD/">appStore审核踩坑未完待续</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/06/29/TCP%E5%8D%8F%E8%AE%AE%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/">TCP协议三次握手和四次挥手</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/06/13/%E4%B8%80%E9%94%AE%E7%99%BB%E5%BD%95%E5%8A%9F%E8%83%BD%E5%B0%8F%E7%BB%93/">一键登录功能小结</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/06/03/githubusercontent443/">githubusercontent443</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/05/01/fastlane%E8%87%AA%E5%8A%A8%E6%89%93%E5%8C%85%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B/">fastlane自动打包详细流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/04/03/selector%20%E3%80%81SEL%20%E3%80%81@selector(SEL%E5%8E%9F%E7%90%86)/">selector 、SEL 、@selector(SEL原理)</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/03/03/iOS%E5%86%85%E8%B4%AD%E6%80%BB%E7%BB%93/">iOS内购总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/18/%E4%BB%A3%E7%90%86-%E9%80%9A%E7%9F%A5-Block%E7%9A%84%E5%8C%BA%E5%88%AB/">代理-通知-Block的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/13/NSNotificationCenter%E9%80%9A%E7%9F%A5%E7%9A%84%E5%8E%9F%E7%90%86/">NSNotificationCenter通知的原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/01/iOS%E5%9B%BE%E7%89%87%E5%83%8F%E7%B4%A0RGBA%E5%A4%84%E7%90%86/">iOS图片像素RGBA处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/01/autorelease%E5%92%8CAutoreleasepool/">autorelease和Autoreleasepool</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/01/%E4%BB%80%E4%B9%88%E6%98%AF%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0/">什么是内联函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/12/29/%E9%93%B6%E8%A1%8C%E5%AE%B6%E7%AE%97%E6%B3%95/">银行家算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/12/01/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/">时间复杂度</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/11/15/iOS%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">iOS内存管理</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/11/06/MQTT%E8%AF%A6%E8%A7%A3%E5%8F%8A%E4%BD%BF%E7%94%A8/">MQTT详解及使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/11/03/XMPP%E4%B8%8EMQTT%E5%8C%BA%E5%88%AB/">XMPP与MQTT区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/10/06/%E7%BA%BF%E7%A8%8B%E5%92%8C%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB/">线程和进程的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/09/16/%E7%BA%BF%E7%A8%8B%E6%AD%BB%E9%94%81%E7%9A%84%E5%9B%9B%E4%B8%AA%E6%9D%A1%E4%BB%B6/">线程死锁的四个条件</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/08/15/GCD%E8%AF%A6%E8%A7%A3/">GCD详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/07/11/pthread-NSThread-GCD%E7%9A%84%E5%8C%BA%E5%88%AB/">pthread-NSThread-GCD的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/11/Runtime%E5%BA%94%E7%94%A8/">Runtime应用</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/10/Runtime%E6%B6%88%E6%81%AF%E5%8F%91%E9%80%81%E5%92%8C%E6%B6%88%E6%81%AF%E8%BD%AC%E5%8F%91/">Runtime消息发送和消息转发</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/06/Category/">Category</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/03/Runtime%E5%9F%BA%E6%9C%AC%E4%BA%86%E8%A7%A3/">Runtime基本了解</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/01/%E5%AF%B9%E8%B1%A1%E3%80%81%E7%B1%BB%E3%80%81%E5%85%83%E7%B1%BB%E7%9A%84%E5%85%B3%E7%B3%BB/">对象、类、元类的关系</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/05/12/iOS%E7%BC%96%E5%86%99%E8%A7%84%E8%8C%83%E6%80%BB%E7%BB%93/">iOS编写规范总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/04/12/RunLoop%E5%BA%95%E5%B1%82/">RunLoop底层</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/12/iOS%E6%8E%A8%E9%80%81%E5%8E%9F%E7%90%86/">iOS推送原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/02/Pod%E4%B8%AD%E8%8E%B7%E5%8F%96%E5%9B%BE%E7%89%87%E8%BF%9B%E8%A1%8C%E5%80%8D%E5%9B%BE%E7%9A%84%E9%80%82%E9%85%8D/">Pod中获取图片进行倍图的适配</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/02/iCarousel%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E/">iCarousel使用说明</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/01/setValue%E5%92%8CsetObject%E7%9A%84%E5%8C%BA%E5%88%AB/">setValue和setObject的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/21/BeeHive%E6%A1%86%E6%9E%B6%E7%90%86%E8%A7%A3/">BeeHive框架理解</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/20/iOS%E6%8C%81%E4%B9%85%E5%8C%96%E6%96%B9%E5%BC%8F/">setValue和setObject的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/10/app%E6%89%93%E5%BC%80%E5%B0%8F%E7%A8%8B%E5%BA%8F/">setValue和setObject的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/01/KVO/">KVO</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/12/21/KVC/">KVC</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/10/11/%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE%E5%9B%A2%E9%98%9F%E7%9A%84%E5%85%AC%E5%85%B1%E7%BB%84%E4%BB%B6%E7%A7%81%E6%9C%89%E5%BA%93/">创建项目团队的公共组件私有库</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/09/12/git%E5%88%9B%E5%BB%BA%E7%89%88%E6%9C%AC%E5%BA%93%E5%91%BD%E4%BB%A4/">git创建版本库命令</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/08/12/%E6%9C%AC%E5%9C%B0%E7%A7%81%E6%9C%89%E5%BA%93%E5%88%9B%E5%BB%BA%E4%B8%8E%E4%BD%BF%E7%94%A8/">本地私有库创建与使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/06/12/Block%E5%8E%9F%E7%90%86%E4%BB%A5%E5%8F%8A%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8%E9%97%AE%E9%A2%98/">Block原理以及循环引用问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/05/15/FOUNDATION_EXTERN,UIKIT_EXTERN,#define,static%E5%85%B3%E9%94%AE%E5%AD%97/">FOUNDATION_EXTERN,UIKIT_EXTERN,#define,static关键字</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/15/OC%E4%B8%ADweak%E7%9A%84%E7%90%86%E8%A7%A3/">OC中weak的理解</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/03/25/%E5%93%88%E5%B8%8C%E8%A1%A8/">哈希表</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/03/15/atomic%E5%92%8Cnonatomic%E5%8C%BA%E5%88%AB/">atomic和nonatomic区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/02/11/copy%E5%92%8CmutableCopy/">copy和mutableCopy</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/01/09/nil-Nil-NULL-NSNull/">nil-Nil-NULL-NSNull</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/01/05/property%E3%80%81synthesize%E3%80%81dynamic/">property、synthesize、dynamic</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/15/iOS%E7%AD%BE%E5%90%8D%E8%AE%A4%E8%AF%81%E8%BF%87%E7%A8%8B/">iOS签名认证过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/08/removeFromSuperview%E8%AF%A6%E8%A7%A3/">removeFromSuperview详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/01/iOS%E5%93%8D%E5%BA%94%E9%93%BE%E4%B9%8B%E4%BA%8B%E4%BB%B6%E4%BC%A0%E9%80%92%E5%92%8C%E5%93%8D%E5%BA%94/">iOS响应链之事件传递和响应</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/17/iOSView%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/">iOSView的生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/10/Hexo%E4%BD%BF%E7%94%A8/">Hexo使用</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2024 Haven
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo &nbsp;&nbsp;</a><a href="https://github.com/maochunguang" target="_blank">Blog</a> by tommy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

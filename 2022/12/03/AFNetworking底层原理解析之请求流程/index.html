@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl"/>
+  
+  
+  
+  
+  <title>AFNetworking底层原理解析之请求流程.md | Haven的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="框架结构NSURLSession  AFURLSessionManager AFHTTPSessionManager  Serialization  AFURLRequestSerialization    AFHTTPRequestSerializer  AFJSONRequestSerializer  AFPropértyListRequestSerializer   AFURLRespon">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AFNetworking底层原理解析之请求流程.md">
+<meta property="og:url" content="https://havenwwh.github.io/2022/12/03/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Haven的博客">
+<meta property="og:description" content="框架结构NSURLSession  AFURLSessionManager AFHTTPSessionManager  Serialization  AFURLRequestSerialization    AFHTTPRequestSerializer  AFJSONRequestSerializer  AFPropértyListRequestSerializer   AFURLRespon">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-12-03T04:10:31.000Z">
+<meta property="article:modified_time" content="2022-12-03T04:10:31.000Z">
+<meta property="article:author" content="Haven">
+<meta property="article:tag" content="协议">
+<meta property="article:tag" content="消息">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.png" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Haven</a></h1>
+        </hgroup>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">主页</a></li>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/tags">标签</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/HavenWWH" title="github">github</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Block/" style="font-size: 11.43px;">Block</a> <a href="/tags/Category/" style="font-size: 10px;">Category</a> <a href="/tags/Deadlock/" style="font-size: 10px;">Deadlock</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Https/" style="font-size: 10px;">Https</a> <a href="/tags/KVC/" style="font-size: 10px;">KVC</a> <a href="/tags/KVO/" style="font-size: 10px;">KVO</a> <a href="/tags/O-n/" style="font-size: 10px;">O(n)</a> <a href="/tags/Rumtime/" style="font-size: 10px;">Rumtime</a> <a href="/tags/RunLoop/" style="font-size: 10px;">RunLoop</a> <a href="/tags/Runtime/" style="font-size: 15.71px;">Runtime</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/git/" style="font-size: 11.43px;">git</a> <a href="/tags/%E4%BB%A3%E7%90%86/" style="font-size: 10px;">代理</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/" style="font-size: 10px;">代码规范</a> <a href="/tags/%E5%83%8F%E7%B4%A0/" style="font-size: 10px;">像素</a> <a href="/tags/%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0/" style="font-size: 10px;">内联函数</a> <a href="/tags/%E5%87%BD%E6%95%B0%E7%9A%84%E8%B0%83%E7%94%A8/" style="font-size: 10px;">函数的调用</a> <a href="/tags/%E5%88%86%E7%B1%BB/" style="font-size: 10px;">分类</a> <a href="/tags/%E5%8A%9F%E8%83%BD%E7%82%B9/" style="font-size: 11.43px;">功能点</a> <a href="/tags/%E5%8D%8F%E8%AE%AE/" style="font-size: 17.14px;">协议</a> <a href="/tags/%E5%8E%9F%E7%90%86/" style="font-size: 18.57px;">原理</a> <a href="/tags/%E5%91%BD%E4%BB%A4/" style="font-size: 10px;">命令</a> <a href="/tags/%E5%93%8D%E5%BA%94%E9%93%BE/" style="font-size: 10px;">响应链</a> <a href="/tags/%E5%9B%BE%E7%89%87/" style="font-size: 12.86px;">图片</a> <a href="/tags/%E5%9F%BA%E7%A1%80/" style="font-size: 12.86px;">基础</a> <a href="/tags/%E5%B8%B8%E8%AF%86/" style="font-size: 10px;">常识</a> <a href="/tags/%E5%BA%95%E5%B1%82/" style="font-size: 10px;">底层</a> <a href="/tags/%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8/" style="font-size: 10px;">循环引用</a> <a href="/tags/%E6%8E%A8%E9%80%81/" style="font-size: 10px;">推送</a> <a href="/tags/%E6%8F%92%E4%BB%B6%E9%AA%8C%E8%AF%81/" style="font-size: 10px;">插件验证</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 10px;">数据库</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 10px;">数据结构</a> <a href="/tags/%E6%97%A5%E5%B8%B8%E8%B8%A9%E5%9D%91/" style="font-size: 11.43px;">日常踩坑</a> <a href="/tags/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" style="font-size: 10px;">时间复杂度</a> <a href="/tags/%E6%9C%AC%E5%9C%B0%E5%8C%96%E5%AD%98%E5%82%A8/" style="font-size: 10px;">本地化存储</a> <a href="/tags/%E6%A1%86%E6%9E%B6/" style="font-size: 10px;">框架</a> <a href="/tags/%E6%B6%88%E6%81%AF/" style="font-size: 14.29px;">消息</a> <a href="/tags/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" style="font-size: 10px;">生命周期</a> <a href="/tags/%E7%9F%A5%E8%AF%86%E7%82%B9/" style="font-size: 20px;">知识点</a> <a href="/tags/%E7%A7%81%E6%9C%89%E5%BA%93/" style="font-size: 11.43px;">私有库</a> <a href="/tags/%E7%AD%BE%E5%90%8D%E8%AE%A4%E8%AF%81/" style="font-size: 10px;">签名认证</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 11.43px;">算法</a> <a href="/tags/%E7%BA%BF%E7%A8%8B/" style="font-size: 12.86px;">线程</a> <a href="/tags/%E7%BB%84%E4%BB%B6%E5%8C%96/" style="font-size: 12.86px;">组件化</a> <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85/" style="font-size: 10px;">自动化打包</a> <a href="/tags/%E8%AF%81%E4%B9%A6/" style="font-size: 10px;">证书</a> <a href="/tags/%E8%B5%84%E6%BA%90%E4%B8%8B%E8%BD%BD/" style="font-size: 10px;">资源下载</a> <a href="/tags/%E8%B8%A9%E5%9D%91%E6%97%A5%E5%B8%B8/" style="font-size: 10px;">踩坑日常</a> <a href="/tags/%E9%80%82%E9%85%8D/" style="font-size: 11.43px;">适配</a> <a href="/tags/%E9%80%9A%E7%9F%A5/" style="font-size: 10px;">通知</a> <a href="/tags/%E9%93%BE%E6%8E%A5%E8%B7%B3%E8%BD%AC/" style="font-size: 10px;">链接跳转</a> <a href="/tags/%E9%94%81/" style="font-size: 10px;">锁</a>
+                    </div>
+                </section>
+                
+                
+                
+                
+                <section class="switch-part switch-part3">
+                
+                    <div id="js-aboutme">爱好很多的程序员</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Haven</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.png" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Haven</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags">标签</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/HavenWWH" title="github">github</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-AFNetworking底层原理解析之请求流程" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2022/12/03/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B/" class="article-date">
+      <time datetime="2022-12-03T04:10:31.000Z" itemprop="datePublished">2022-12-03</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      AFNetworking底层原理解析之请求流程.md
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/iOS/">iOS</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8D%8F%E8%AE%AE/" rel="tag">协议</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B6%88%E6%81%AF/" rel="tag">消息</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <span id="more"></span>
+<h4 id="框架结构"><a href="#框架结构" class="headerlink" title="框架结构"></a>框架结构</h4><p><strong>NSURLSession</strong></p>
+<ul>
+<li>AFURLSessionManager</li>
+<li>AFHTTPSessionManager</li>
+</ul>
+<p><strong>Serialization</strong></p>
+<ol>
+<li>AFURLRequestSerialization</li>
+</ol>
+<ul>
+<li> AFHTTPRequestSerializer</li>
+<li> AFJSONRequestSerializer</li>
+<li> AFPropértyListRequestSerializer</li>
+</ul>
+<ol start="2">
+<li>AFURLResponseSerialization</li>
+</ol>
+<ul>
+<li>AFHTTPResponseSerializer</li>
+<li>AFJSONResponseSerializer</li>
+<li>AXMLParserResponseSerializer</li>
+<li>AFXMLDocumentResponseSerializer (macOS)</li>
+<li>AFPropertyListResponseSerializer</li>
+<li>AFImageResponseSerializer</li>
+<li>AFCompoundResponseSerializer</li>
+</ul>
+<p><strong>AFSecurityPolicy</strong></p>
+<p><strong>AFNetworkReachabilityManager</strong></p>
+<p>在AFN框架中，负责网络请求通讯最重要的两个类AFURLSessionManager、AFHTTPSessionManager。AFHTTPSessionManager又是继承于AFURLSessionManager，进行了封装。</p>
+<p>AFURLRequestSerialization结构的类，主要用于网络请求之前的操作配置，负责配置网络请求的请求头部、序列化请求参数</p>
+<p>AFURLResponseSerialization结构的类，主要用于网络请求之后的数据处理，针对不同的数据进行处理，比如JSON、XML、plist、图片格式等数据。</p>
+<p>附加功能类中，AFSecurityPolicy主要用于HTTPS环境下的认证安全请求通讯。如果是通过CA认证过的HTTPS访问地址，使用AFN时只需要拼接上https://即可，AFN的网络请求配置中默认使用CA认证访问HTTPS地址；若是自签的证书时，则需要当前类用于进行认证。</p>
+<p>AFNetworkReachabilityManager，用于网络状态的监听，判断是否有网络，以及判断网络连接类型，比如蜂窝网络或WiFi环境。但当前类无法判断当前环境能否访问服务器服务。其原理是利用主机的数据包发送。</p>
+<hr>
+<h4 id="AFURLSessionManager"><a href="#AFURLSessionManager" class="headerlink" title="AFURLSessionManager"></a>AFURLSessionManager</h4><p>AFURLSessionManager 这个类是AFN框架的核心类，基本上通过它来实现了大部分核心功能。负责请求的建立、管理、销毁、安全、请求重定向、请求重启等各种功能。他主要实现了NSURLSession和NSRULSessionTask的封装。</p>
+<p><strong>AFN网络请求的方法</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">+(AFHTTPSessionManager *)httpManager&#123;</span><br><span class="line">    // 获取请求对象</span><br><span class="line">    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];</span><br><span class="line">    // 设置请求格式</span><br><span class="line">    manager.requestSerializer = [AFJSONRequestSerializer serializer];</span><br><span class="line">    // 设置返回格式</span><br><span class="line">    manager.responseSerializer = [AFJSONResponseSerializer serializer];</span><br><span class="line">    manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@&quot;text/plain&quot;, @&quot;multipart/form-data&quot;, @&quot;application/json&quot;, @&quot;text/html&quot;, @&quot;image/jpeg&quot;, @&quot;image/png&quot;, @&quot;application/octet-stream&quot;, @&quot;text/json&quot;, nil];</span><br><span class="line">    [manager.requestSerializer setValue:@&quot;application/json&quot; forHTTPHeaderField:@&quot;Accept&quot;];</span><br><span class="line">    [manager.requestSerializer setValue:@&quot;application/json&quot; forHTTPHeaderField:@&quot;Content-Type&quot;];</span><br><span class="line">    manager.requestSerializer.timeoutInterval = kRequestTimeOut;</span><br><span class="line">    return manager;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">+(__kindof NSURLSessionTask *)Post:(NSString *)URLString parameters:(id)parameters success:(void(^)(id responseObject))success failure:(void(^)(NSError *))failure&#123;</span><br><span class="line">    AFHTTPSessionManager *manager = [self httpManager];</span><br><span class="line">    return [manager POST:URLString parameters:parameters progress:^(NSProgress * _Nonnull uploadProgress) &#123;</span><br><span class="line">        </span><br><span class="line">    &#125; success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) &#123;</span><br><span class="line">        if (success) &#123;</span><br><span class="line">            success(responseObject);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) &#123;</span><br><span class="line">        if (failure) &#123;</span><br><span class="line">            failure(error);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AFN帮我们将繁琐的网络请求进行了封装，只需要传入访问服务器URL以及参数，就可以通过block返回给对应的正确或者错误数据，而且还可以通过progress的block不断获取进度</p>
+<p>AFHTTPSessionManager中初始化方法，最终都会指向调用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (instancetype)initWithBaseURL:(NSURL *)url sessionConfiguration:(NSURLSessionConfiguration *)configuration</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">- (instancetype)initWithBaseURL:(NSURL *)url</span><br><span class="line">           sessionConfiguration:(NSURLSessionConfiguration *)configuration</span><br><span class="line">&#123;</span><br><span class="line">    self = [super initWithSessionConfiguration:configuration];</span><br><span class="line">    if (!self) &#123;</span><br><span class="line">        return nil;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // Ensure terminal slash for baseURL path, so that NSURL +URLWithString:relativeToURL: works as expected</span><br><span class="line">    if ([[url path] length] &gt; 0 &amp;&amp; ![[url absoluteString] hasSuffix:@&quot;/&quot;]) &#123;</span><br><span class="line">        url = [url URLByAppendingPathComponent:@&quot;&quot;];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    self.baseURL = url;</span><br><span class="line"></span><br><span class="line">    self.requestSerializer = [AFHTTPRequestSerializer serializer];</span><br><span class="line">    self.responseSerializer = [AFJSONResponseSerializer serializer];</span><br><span class="line"></span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>初始化时，调用了父类的方法[super initWithSessionConfiguration:configuration]</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">- (instancetype)initWithSessionConfiguration:(NSURLSessionConfiguration *)configuration &#123;</span><br><span class="line">    self = [super init];</span><br><span class="line">    if (!self) &#123;</span><br><span class="line">        return nil;</span><br><span class="line">    &#125;</span><br><span class="line">    //设置默认的configuration，配置session</span><br><span class="line">    if (!configuration) &#123;</span><br><span class="line">        configuration = [NSURLSessionConfiguration defaultSessionConfiguration];</span><br><span class="line">    &#125;</span><br><span class="line">    //当前实例变量持有configuration</span><br><span class="line">    self.sessionConfiguration = configuration;</span><br><span class="line"></span><br><span class="line">    //设置delegate的操作队列并发线程数量为1，即串行队列</span><br><span class="line">    self.operationQueue = [[NSOperationQueue alloc] init];</span><br><span class="line">    self.operationQueue.maxConcurrentOperationCount = 1;</span><br><span class="line"></span><br><span class="line">    /*</span><br><span class="line">     </span><br><span class="line">     */</span><br><span class="line">    self.session = [NSURLSession sessionWithConfiguration:self.sessionConfiguration delegate:self delegateQueue:self.operationQueue];</span><br><span class="line">    </span><br><span class="line">    //默认为JSON解析</span><br><span class="line">    self.responseSerializer = [AFJSONResponseSerializer serializer];</span><br><span class="line">    </span><br><span class="line">    //设置默认证书，无条件信任HTTPS认证</span><br><span class="line">    self.securityPolicy = [AFSecurityPolicy defaultPolicy];</span><br><span class="line"></span><br><span class="line">#if !TARGET_OS_WATCH</span><br><span class="line">    //网络状态监听</span><br><span class="line">    self.reachabilityManager = [AFNetworkReachabilityManager sharedManager];</span><br><span class="line">#endif</span><br><span class="line"></span><br><span class="line">    //存放一个 delegate = value，taskId = key 的字典</span><br><span class="line">    self.mutableTaskDelegatesKeyedByTaskIdentifier = [[NSMutableDictionary alloc] init];</span><br><span class="line"></span><br><span class="line">    //使用NSLock确保线程安全</span><br><span class="line">    self.lock = [[NSLock alloc] init];</span><br><span class="line">    self.lock.name = AFURLSessionManagerLockName;</span><br><span class="line"></span><br><span class="line">    //异步获取当前session所有未完成的task。会让后台任务重新回来初始化session，之前可能存在的任务进行置空处理</span><br><span class="line">    //参考AFN问题汇总https://github.com/AFNetworking/AFNetworking/issues/3499</span><br><span class="line">    [self.session getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks) &#123;</span><br><span class="line">        for (NSURLSessionDataTask *task in dataTasks) &#123;</span><br><span class="line">            [self addDelegateForDataTask:task uploadProgress:nil downloadProgress:nil completionHandler:nil];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        for (NSURLSessionUploadTask *uploadTask in uploadTasks) &#123;</span><br><span class="line">            [self addDelegateForUploadTask:uploadTask progress:nil completionHandler:nil];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        for (NSURLSessionDownloadTask *downloadTask in downloadTasks) &#123;</span><br><span class="line">            [self addDelegateForDownloadTask:downloadTask progress:nil destination:nil completionHandler:nil];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br><span class="line"></span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从上述代码中可以看出，在AFN初始化过程中，除了对NSURLSession进行初始化之外，还设置了许多默认配置，例如创建串行队列、默认JSON解析、无条件信任证书、保证线程安全、网络状态监听以及旧任务置空处理等操作</p>
+<p>以POST请求为例，调用的方法如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (nullable NSURLSessionDataTask *)POST:(NSString *)URLString parameters:(nullable id)parameters progress:(nullable void (^)(NSProgress *uploadProgress))uploadProgress success:(nullable void (^)(NSURLSessionDataTask *task, id _Nullable responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *error))failure</span><br></pre></td></tr></table></figure>
+<p>进入该方法查看实现，发现除了常用的POST和GET请求之外，还有PUT、HEAD、DELETE、PATCH这些其它请求类型的方法实现，都执行了同一个方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (NSURLSessionDataTask *)dataTaskWithHTTPMethod:(NSString *)method URLString:(NSString *)URLString parameters:(id)parameters uploadProgress:(nullable void (^)(NSProgress *uploadProgress)) uploadProgress downloadProgress:(nullable void (^)(NSProgress *downloadProgress)) downloadProgress success:(void (^)(NSURLSessionDataTask *, id))success failure:(void (^)(NSURLSessionDataTask *, NSError *))failure</span><br></pre></td></tr></table></figure>
+<p> 在该方法中，首先调用AFHTTPRequestSerializer的requestWithMethod函数构建request；当有错误时，处理request构建产生的错误 - serializationError；其中relativeToURL表示将URLString拼接至baseURL中。接下来，继续查看requestSerializer的创建方法实现</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">- (NSMutableURLRequest *) requestWithMethod: (NSString *)method</span><br><span class="line">URLString:(NSString *)URLString parameters: (id) parameters</span><br><span class="line">error: (NSError * __autoreleasing *)error</span><br><span class="line">&#123;</span><br><span class="line">	//断言如果为nil，则直接打印出来</span><br><span class="line">	NSParameterAssert (method);</span><br><span class="line">	NSParaneterAssert (URLSYring)</span><br><span class="line">	//传进来的是宇符串，转换成URL</span><br><span class="line">	NSURL *ur] = ENSURL URLWithString:URLString];</span><br><span class="line">	NSParameterAssert (url) ;</span><br><span class="line">	NSMutableURLRequest *mutableRequest = [[NSMutableURLRequest alloc] initwithURL:url];</span><br><span class="line">	//设置请求方式</span><br><span class="line">	mutableRequest .HTTPMethod = method;</span><br><span class="line">	//將request的各种属性进行遍历，给mutableRequest自带的属性赋值</span><br><span class="line">	for (NSString *keyPath in AFHTTPRequestSerializerObservedKeyPaths()) &#123;</span><br><span class="line">		if(Iself.mutable0bservedChangedkeyPaths containsobject:keyPath]） &#123;</span><br><span class="line">			//通过KVC动态给mutableRequest添加value</span><br><span class="line">			[mutableRequest setValue: [self valueForKeyPath:keyPath] forKey: keyPath];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	//将传入的参数进行编码</span><br><span class="line">	mutableRequest = [Iself requestBySerializingRequest:mutableRequest withParameters:parameters error:error] mutableCopy』</span><br><span class="line">	return mutableRequest;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>requestSerializer创建方法实现<br>其中最重要的部分，就是将request的各种属性进行遍历，用于给mutableRequest自带的属性赋值。<br>关于AFHTTPRequestSerializerObservedKeyPaths()，查看实现方法可以发现返回一个带有方法名的数组，定义了一个static的方法，表示该方法只能在本文件中使用。利用runtime的反射调用NSStringFromSelector方法，将六个方法名转换成字符串存入数组中。而这个六个方法又分别对应了mutableRequest的六个属性名称 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">static NSArray * AFHTTPRequestSerializerObservedKeyPaths() &#123;</span><br><span class="line">	static NSArray *_AFHTTPRequestSerializerObservedKeyPaths = nil;</span><br><span class="line">	static dispatch_once_t onceToken;</span><br><span class="line">	dispatch_once (&amp;onceToken,^&#123;</span><br><span class="line">		_AFHTTPRequestSerializerObservedKeyPaths =</span><br><span class="line">		@[NSStringFromSelector @selector (allowsCellularAccess)),</span><br><span class="line">			NSStringFromSelector(@selector(cachePolicy)),</span><br><span class="line">			NSStringFromSelector (@selector (HTTPShouldHandleCookies)), </span><br><span class="line">			NSStringFromSelector@selector (HTTPShouldUsePipelining)), </span><br><span class="line">			NSStringFromSelector (@selector (networkServiceType)), NSStringFromSelector (@selector (timeoutInterval))];</span><br><span class="line">	&#125;):</span><br><span class="line">	return _AFHTTPRequestSerializerObservedKeyPaths;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>AFHTTPRequestSerializerObservedKeyPaths()代码实现</p>
+<ol>
+<li>是否允许使用设备的蜂窝移动网络来创建request，默认为允许;</li>
+<li>创建的request所使用的缓存策略，默认使用NSURLRequestUseProtocolCachePolicy，该策略表示如果缓存不存在，直接从服务端获取。如果缓存存在，会根据response中的Cache-Control字段判断下一步操作，如: Cache-Control字段为must-revalidata, 则 询问服务端该数据是否有更新，无更新直接返回给用户缓存数据，若已更新，则请求服务端.</li>
+<li>如果设置HTTPShouldHandleCookies为YES，就处理存储在NSHTTPCookieStore中的cookies HTTPShouldHandleCookies表示是否应该给request设置cookie并随request一起发送出去</li>
+<li>HTTPShouldUsePipelining表示receiver(理解为iOS客户端)的下一个信息是否必须等到上一个请求回复才能发送。如果为YES表示可以，NO表示必须等receiver收到先前的回复才能发送下个信息</li>
+<li>设定request的network service类型. 默认NSURLNetworkServiceTypeDefault. 这个network service是为了告诉系统网络层这个request使用的目的。 比如NSURLNetworkServiceTypeVoIP表示的这个request是用来请求网际协议通话技术(Voice over IP)。系统能根据提供的信息来优化网络处理，从而优化电池寿命，网络性能等等,客户端基本不使用</li>
+<li>超时机制，默认60秒</li>
+</ol>
+<p>至于要在此处实现遍历的目的，是因为在AFHTTPRequestSerializer类的init方法中，AFN给上面指定的6个方法选择器每一个元素添加了KVO观察者</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">for (NsString *keyPath in AFHTTPRequestSerializer0bservedkeyPaths()) &#123;</span><br><span class="line">	if ([self respondsToSelector:NSSelectorFromString(keyPath)]) &#123;</span><br><span class="line">	//自己给自己的方法添加观察者</span><br><span class="line">	[self addObserver:self forkeyPath: keyPath options:NSKeyValueObservingOptionNew</span><br><span class="line">context：AFHTTPRequestSerializerObserverContext]:</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>self为自己的方法添加观察者</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">-(void)observeValueForKeyPath: (NSString *)keyPath ofObject: ( unused id)object change: (NSDictionary *) change context: (void *) context &#123;</span><br><span class="line">	if (context == AFHTTPRequestSerializerObserverContext) &#123;</span><br><span class="line">		if ([change [NSKeyValueChangeNewKey] isEqual:[NSNull nulljj) &#123;</span><br><span class="line">			[self .mutable0bservedChangedKeyPaths removeObject:keyPath];</span><br><span class="line">		&#125; else &#123;</span><br><span class="line">			[self.mutable0bservedChangedKeyPaths addObject: keyPath];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>KVO代理实现<br>当数组的元素发生变化时，判断新值是否为空。若为空则从mutableObservedChangedKeyPaths可变集合中移除；不为空，则添加至可变集合中。<br> 小提示：关于NSNull，包含了唯一方法+(NSNull *)null，是一个对象，用于表示零值的单独对象。主要用于不能使用nil的场景下，例如可变数组中，想插入一个空对象的情况。<br> 因此，在AFHTTPSessionManager初始完成之后，需要额外添加自定义的request配置时，比如超时时间设置为10秒。这时KVO监听到timeoutInterval的属性发生变化，将keyPath添加到mutableObservedChangedKeyPaths可变集合中。然后，在执行网络请求方法时，会遍历该可变集合，通过KVC动态的给mutableRequest添加value，最终实现将自定义配置添加至request中。<br> 而且在AFHTTPRequestSerializer类的初始化方法中，AFN自动添加了网络请求头部内容</p>
+<p>接下来，到了AFN的重点，对传入的参数字典进行处理。<br> 使用AFN传入的参数格式为字典，但在网络请求中，是要转换成key=value&amp;key=value的形式(GET请求直接拼接到URL之后，POST请求放入request body中)，才能传给服务端获取有效的数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">//将我们传入的宇典转成字符串</span><br><span class="line">NSString *query = nil;</span><br><span class="line">if (parameters) &#123;</span><br><span class="line">	//自定义的解析方式</span><br><span class="line">	if (self.queryStringSerialization) €</span><br><span class="line">		NSError *serializationError;</span><br><span class="line">		query = self.queryStringSerialization(request, parameters, &amp;serializationError)</span><br><span class="line">		if (serializationError) &#123;</span><br><span class="line">			if (error) &#123;</span><br><span class="line">				*error = serializationError;</span><br><span class="line">			&#125;</span><br><span class="line">			return nil;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">		//默认解析方式，宇典一&gt; 宇符串：key=valueakey=value</span><br><span class="line">		switch (self.queryStringSerializationstyle) &#123;</span><br><span class="line">		case AFHTTPRequestQueryStringDefaultStyle:</span><br><span class="line">			//将parameters传入这个C函数</span><br><span class="line">			query = AFQueryStringFromParameters(parameters);</span><br><span class="line">			break;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将请求参数字典转化成字符串<br>NSString * AFQueryStringFromParameters(NSDictionary *parameters)C函数的作用，是遍历数组中的AFQueryStringPair，然后以&amp;符号拼接。AFQueryStringPair是一个数据处理类，只有两个属性:field和value；一个方法：-URLEncodedStringValue。它的作用就是上面我们说的，以key=value的形式，然后用URL Encode编码，拼接成字符串。<br> 在遍历过程中，最终指向了NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value)函数，为了保证参数字典中，所有的value类型确保为字符串类型，这里便使用了递归，针对value可能为字典、数组、集合的类型时进行解析。例如，之前的项目中当需要向后台传输一段用户的定位数据用于分析行动轨迹时，传参的字典中的location的key值嵌套了一个包含分别以经度和纬度为key的字典。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) (</span><br><span class="line">	NSMutableArray *mutableQueryStringComponents = [NSMutableArray array);</span><br><span class="line">	/*根据需要排列的对款的description来进行开序排列，井且selector使用的是compare:</span><br><span class="line">因为对象的description返回的是NSString.</span><br><span class="line">，所以此处compare： 使用的是NSStzing的compare函数</span><br><span class="line">*/</span><br><span class="line">	NSSortDescriptor *sortDescriptor - (NSSortDescriptor sortDescriptorWithkey:@&quot;description&quot; ascending:YES</span><br><span class="line">selector:@selector (compare:)]:</span><br><span class="line">	//判断vaLue是什么类型的，然后去道归调用自己，直到解析的是除了azray dic set以外的元素，然后把得到的参致数组返回。</span><br><span class="line">	if ([value isKindOfClass:(NSDictionary class])) &#123;</span><br><span class="line">		NSDictionary *dictionary = velue;</span><br><span class="line">		// Sort dictionary keys to ensure consistent ordering in query string, which is important when deserializing potentially ambiguous sequences, such as an array of dictionaries</span><br><span class="line">		/*</span><br><span class="line">		allkeys: count/start</span><br><span class="line">		*/ </span><br><span class="line">		for (id nestedkey in (dictionary.allkeys sortedArrayUsingDescriptors:el sortDescriptor )]) &#123;</span><br><span class="line">			id nestedValue = dictionary (nestedKey]; //nestedkey=count nestedvalue=5</span><br><span class="line">			if (nestedValue) &#123;</span><br><span class="line">				[mutableQueryStringComponents addobjectsFromArray:AFQueryStringPairsFromKeyAndValue((key</span><br><span class="line">				[NSString stringwithFormat:@&quot;%©[%]&quot;, key, nestedKey] : nestedKey), nestedValue));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	) else if (value isKindofClass: (NSArray class)]) (</span><br><span class="line">		NSArray *array = value;</span><br><span class="line">		for (id nestedValue in array) (</span><br><span class="line">				[mutableQueryStringComponentsaddObjectsFromArray:AFQueryStringPairsFromKeyAndValue((NSString</span><br><span class="line">stringwithformat:0&quot;%@[]&quot;, key), nestedValue)];</span><br><span class="line">		&#125;</span><br><span class="line">	) else if ([value isKindOfClass: (NSSet class])) (</span><br><span class="line">		NSSet *set = value;</span><br><span class="line">		for (id obj in [set sortedArrayUsingDescriptors:@[ sortDescriptor 1]) (</span><br><span class="line">			[mutableQueryStringComponentsaddobjectsFromArray:AFQueryStringPairsFromKeyAndValue(key,obj)];</span><br><span class="line">		)</span><br><span class="line">	) else (//既然是递归，那么就要有结東通归的情况，比如解析到最后，对应va1ue是一个NSString，那么就得调用西数中最后的e1se语句</span><br><span class="line">		//AFQueryStringPair數据处理类，mutableQuezyStringComponents中的元景类型是AFQueryStringPair</span><br><span class="line">		[mutableQueryStringComponents addObject: ((AFQueryStringPair alloc) initwithfield:key value:value]);</span><br><span class="line">	&#125;</span><br><span class="line">	return mutableQueryStringComponents;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>递归确保所有的value最终全部转换成字符串形式<br> 当value为字典、数组、集合的类型时，会执行递归解析，直到value类型都不为上述类型时，向mutableQueryStringComponents添加一个AFQueryStringPair类的对象，其中传入key和value并返回出去。<br> （这里AFN框架执行了升序排列，这里不是很明白为什么要先将字典的key进行升序排列再进行数据递归解析）<br> 当传参字典中所有数据解析完成之后，会通过遍历返回为AFQueryStringPair类的对象，然后将该对象进行百分号编码，用于处理可能存在包含歧义或者不符合规划的字符（可以自行查找关于百分号编码相关资料），最后将字符串拼接”&amp;”符号。<br> 以上，就是AFN框架中，发起网络请求之前，关于request处理相关的操作全部流程分析，其中最主要的功能就是对传参参数进行了数据的递归解析，其次对request的六个相关属性进行KVO监听，可以在初始化AFHTTPSessionManager对象之后，自定义修改指定request属性时，通过KVO代理方法以及动态KVC最终在request中实现配置修改</p>
+<hr>
+<hr>
+<p>上面讲到在AFHTTPSessionManager中，在初始化NSMutableURLRequest对象时的流程分析。接下来继续分析在生成request之后AFN创建task任务的流程<br>在NSMutableURLRequest对象初始化之后，创建了一个NSURLSessionDataTask任务类对象，并将request传入。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">//此时的request已经将参数拼接在ur1后面</span><br><span class="line">__block NSURLSessionDataTask *dataTask -=nil;</span><br><span class="line">dataTask = [self dataTaskwithRequest:request</span><br><span class="line">uploadProgress: uploadProgress downloadProgress: downloadProgress completionHandler: ^ (NSURLResponse * __unused response. id responseObject, NSerror *error) &#123;</span><br><span class="line">	if (error) &#123;</span><br><span class="line">		if (failure) &#123;</span><br><span class="line">			failure (dataTask, error);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">		if (success) &#123;</span><br><span class="line">			success (dataTask, responseObject);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	&#125;]：</span><br><span class="line">	return dataTask;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建task任务代码</p>
+<p>层层代码实现，最终会找到</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- (void)addDelegateForDataTask:(NSURLSessionDataTask *)dataTask uploadProgress:(nullable void (^)(NSProgress *uploadProgress)) uploadProgressBlock downloadProgress:(nullable void (^)(NSProgress *downloadProgress)) downloadProgressBlock completionHandler:(void (^)(NSURLResponse *response, id responseObject, NSError *error))completionHandler</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>方法实现</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">AFURLSessionManagerTaskDelegate *delegate = [[AFURLSessionManagerTaskDelegate alloc] init];</span><br><span class="line">delegate.manager = self;</span><br><span class="line">delegate.completionHandler = completionHandler;</span><br><span class="line">dataTask.taskDescription = self.taskDescriptionForSessionTasks;</span><br><span class="line"></span><br><span class="line">[self setDelegate:delegate forTask:dataTask];</span><br><span class="line">//设置回调块</span><br><span class="line">delegate.uploadProgressBlock = uploadProgressBlock;</span><br><span class="line">delegate.downloadProgressBlock = downloadProgressBlock;</span><br></pre></td></tr></table></figure>
+<p>此处的代码意义为将一个session task和一个AFURLSessionManagerTaskDelegate类型的delegate变量绑在一起，而这个绑在一起的工作是由我们的AFURLSessionManager所做。至于绑定的过程，就是以该session task的taskIdentifier为key（taskIdentifier是在创建task的时候NSURLSessionTask为其设置的，不需要手动设置，保证唯一性），delegate为value。赋值给mutableTaskDelegatesKeyedByTaskIdentifier这个NSMutableDictionary类型的变量，以此来确保task唯一</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[self setDelegate:delegate forTask:dataTask]</span><br></pre></td></tr></table></figure>
+<p>方法就是将两者进行绑定，查看其实现代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- (void)setDelegate:(AFURLSessionManagerTaskDelegate *)delegate</span><br><span class="line">            forTask:(NSURLSessionTask *)task</span><br><span class="line">&#123;</span><br><span class="line">    //task和delegate都不能为空</span><br><span class="line">    NSParameterAssert(task);</span><br><span class="line">    NSParameterAssert(delegate);</span><br><span class="line"></span><br><span class="line">    [self.lock lock];</span><br><span class="line">self.mutableTaskDelegatesKeyedByTaskIdentifier[@(task.taskIdentifier)] = delegate;</span><br><span class="line"></span><br><span class="line">    [delegate setupProgressForTask:task];</span><br><span class="line">    [self addNotificationObserverForTask:task];</span><br><span class="line">    [self.lock unlock];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>[self.lock lock]与[self.lock unlock]<br>方法用于确保中间代码块为原子操作，保证线程安全。然后将delegate存入字典，以task的id作为key，说明每个task都有各自的代理。<br> 接着，[delegate setupProgressForTask:task]方法设置两个NSProgress的变量 - 上传uploadProgress和下载downloadProgress，给session task添加了监听KVO事件，用于实时监听返回上传、下载progress的更新进度。其内部实现中设置这两个NSProgress对应的cancel、pause和resume这三个状态，正好对应session task的cancel、suspend和resume三个状态。然后给task的当前接收大小、期望接收大小、当前发送大小以及期望发送大小四个属性进行KVO监听，和上传、下载progress的fractionCompleted属性进行KVO监听（fractionCompleted属性代表当前progress已经完成的比例，取值范围0-1）。当task任务的进度发生变化时，KVO则更新对应的progress属性值，然后赋新值触发时会执行KVO代理中上传或者下载progress的处理，将执行对应的包含object(属性为NSProgress)的代码块，该代码块也就是最终执行网络请求方法中progress:(void (^)(NSProgress * _Nonnull))uploadProgress位置的block代码块。此处代码块中可根据NSProgress的状态做用户自定义的行为，比如需要更新UI进度条的状态之类等等。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">- (void) observeValueForKeyPath: (NSString *) keyPath ofobject: (id)object change: (NSDictionary‹NSString *id&gt;</span><br><span class="line">*)change context: (void *)context &#123;</span><br><span class="line">	if ([object isKindOfClass: [NSURLSessionTask class]] | | [object isKindOfClass: [NSURLSessionDownloadTask</span><br><span class="line">class]])&#123;</span><br><span class="line">		//给进度条赋新值</span><br><span class="line">		if ([keyPath isEqualToString:NSStringFromSelector (@selector (countofBytesReceived))]) &#123;</span><br><span class="line">			self.downloadProgress.completedUnitCount= [change [NSKeyValueChangeNewKey] longLongValue];</span><br><span class="line">		&#125; else if ([keyPath isEqualToString:NSStringFromSelector(@selector (count0fBytesExpectedToReceive) )])</span><br><span class="line">			self.downloadProgress. totalUnitCount = [change [NSKeyValueChangeNewKey] longLongValue];</span><br><span class="line">		] else if ([keyPath isEqualToString:NSStringFromSelector@selector(count0fBytesSent))]) &#123;</span><br><span class="line">			self.u@oadProgress.completedUnitCount = [change[NSKeyValueChangeNewKey] longLongValue];</span><br><span class="line">		] else if ([keyPath isEqualToString:NSStringFromSelector (Cselector(countofBytesExpectedToSend))]) &#123;</span><br><span class="line">			self.uploadProgress. totalUnitCount = [change [NSKeyValueChangeNewKey] longLongValue];</span><br><span class="line">		&#125;</span><br><span class="line">	//上面的赋新值会触发这两个，调用b1ock回调，用户拿到进度</span><br><span class="line">	//根据NSProgress的状态做用户自定义的行为，比如需要更新UI进度条的状态之类的</span><br><span class="line">	else if ([object isEqual: self.downloadProgress]) &#123;</span><br><span class="line">		if (self.downloadProgressBlock) &#123;</span><br><span class="line">			self.downloadProgressBlock(object);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	else if (Lobject isEqual:self .uploadProgress]) &#123;</span><br><span class="line">		if (self.uploadProgressBlock) &#123;</span><br><span class="line">			self.uploadProgressBlock(object) ;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>监听上传、下载progress属性的KVO处理方法实现<br>以上就是AFN的请求过程进度更新返回的内部实现</p>
+<hr>
+<p>这里为什么要在AFN内部添加delegate，并将其和task进行一一绑定？<br> 在上面的更新进度状态时操作，完全可以放到AFURLSessionManager核心类本身中进行执行，但这样全部放在同一类下处理会不断增加核心类的复杂度。因此将请求过程与完成，交给delegate去处理，提高可维护性。</p>
+<hr>
+<p>当task任务执行resume方法开始请求网络后，会执行NSURLSession相关的代理方法。<br> 当收到返回数据时，会执行- (void)URLSession:(__unused NSURLSession *)session dataTask:(__unused NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data代理方法。该代理方法可能会在收到数据时多次执行，因此需要拼接其中的data数据。<br> 当task任务完成之后，不管请求成功还是失败，都会执行- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error代理方法，而此处返回的error并不是服务端的error，而是客户端本身的error，例如网络不可用、访问地址不可达等等</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">- (void)URLSession:(NSURLSession *)session</span><br><span class="line">              task:(NSURLSessionTask *)task</span><br><span class="line">didCompleteWithError:(NSError *)error</span><br><span class="line">&#123;</span><br><span class="line">    AFURLSessionManagerTaskDelegate *delegate = [self delegateForTask:task];</span><br><span class="line"></span><br><span class="line">    // delegate may be nil when completing a task in the background</span><br><span class="line">    // AFN作者说，task若在后台完成，可能delegate会为nil</span><br><span class="line">    if (delegate) &#123;</span><br><span class="line">        [delegate URLSession:session task:task didCompleteWithError:error];</span><br><span class="line"></span><br><span class="line">        // task结束，就移除对应的delegate</span><br><span class="line">        [self removeDelegateForTask:task];</span><br><span class="line">    &#125;</span><br><span class="line">    //自定义Block回调</span><br><span class="line">    if (self.taskDidComplete) &#123;</span><br><span class="line">        self.taskDidComplete(session, task, error);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看下delegate在task完成时[delegate URLSession:session task:task didCompleteWithError:error]做了什么操作。<br> 这时里面代码非常多，但是目的很简单，就是将网络请求相关的所有数据添加至名为userInfo字典中，并最终通过AFURLSessionTaskCompletionHandler代码块返回出去。<br> 打印下userInfo，可以发现字典中存储的key值以及意义：</p>
+<ol>
+<li>AFNetworkingTaskDidCompleteResponseDataKey session 存储task获取到的原始response数据，与序列化后的response有所不同</li>
+<li>AFNetworkingTaskDidCompleteSerializedResponseKey 存储经过序列化（serialized）后的response</li>
+<li>AFNetworkingTaskDidCompleteResponseSerializerKey保存序列化response的序列化器(serializer)</li>
+<li>AFNetworkingTaskDidCompleteAssetPathKey 存储下载任务后，数据文件存放在磁盘上的位置。若downloadFileURL存在，则保存downloadFileURL地址；若不存在，则取出self.mutableData中的data数据保存。</li>
+<li>AFNetworkingTaskDidCompleteErrorKey 错误信息</li>
+</ol>
+<p>当userInfo字典全部保存完成后，首先判断是否存在error。若存在error则说明task任务出错，需要处理并返回出error信息。此处运用到了GCD中dispatch_group调度组（通常在项目中需要指定多个任务全部完成后再执行其它任务时，使用dispatch_group调度组可以最快捷的实现该功能)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dispatch_group_async (manager .completionGroup ?: url_session_manager_completion_group(),</span><br><span class="line">manager. completionQueue ?: dispatch_get_main_queue(),</span><br><span class="line">^ &#123;</span><br><span class="line">	if (self.completionHandler) &#123;</span><br><span class="line">		self.completionHandler (task.response, responseObject, error);</span><br><span class="line">	&#125;</span><br><span class="line">	//主线程中发送完成通知</span><br><span class="line">	dispatch_async(dispatch_get_main_queue(),^ &#123;</span><br><span class="line">		[[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingTaskpidCompleteNotification</span><br><span class="line">object: task userInfo:userInfo];</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>dispatch_group调度组的使用</p>
+<p>利用三位运算符，判断如果没有实现自定义的completionGroup和completionQueue，那么就使用AFNetworking提供的私有的dispatch_group_t和dispatch_get_main_queue线程。在调度组中执行AFURLSessionTaskCompletionHandler代码块并将task.response, responseObject和error返回出去。<br> 当前不存在error时，也就是task任务成功执行，会首先创建一个并发队列，用于在网络请求任务完成后处理数据的，并发队列实现多线程处理多个请求完成后的数据处理，并对数据进行一次序列化操作</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">NSError *serializationError = nil;</span><br><span class="line">responseObject = [manager.responseSerializer responseobjectForResponse:task.response data:data</span><br><span class="line">error:&amp;serializationError];</span><br></pre></td></tr></table></figure>
+<p>根据对应的task和data将response data解析成可用的数据格式，比如JSON serializer就将data解析成JSON格式。序列化完成之后与error存在时数据处理逻辑相同，最终通过执行AFURLSessionTaskCompletionHandler代码块，根据代码块中的数据，返回至外层方法，判断执行失败block还是成功block。<br> 从AFN框架中，可以发现AFURLSessionManagerTaskDelegate与NSURLSessionTask都是通过AFURLSessionManager来进行生成、绑定、销毁等管理操作的<br>以上就是AFN的核心类AFURLSessionManager在网络请求之前、请求中、以及请求结束时，做的事情</p>
+<hr>
+<hr>
+<p>后续讲AFURLRequestSerialization与响应AFURLResponseSerialization的序列化</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2022/12/03/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B/">AFNetworking底层原理解析之请求流程.md</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Haven 的个人博客">Haven</a></p>
+        <p><span>发布时间:</span>2022年12月03日 - 12时10分</p>
+        <p><span>最后更新:</span>2022年12月03日 - 12时10分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2022/12/03/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B/" title="AFNetworking底层原理解析之请求流程.md">https://havenwwh.github.io/2022/12/03/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://havenwwh.github.io/2022/12/03/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B/　　作者: Haven" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a  href="/2022/12/23/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E5%BA%8F%E5%88%97%E5%8C%96/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          AFNetworking底层原理解析之序列化.md
+        
+      </div>
+    </a>
+  
+  
+    <a  href="/2022/09/14/%E6%9C%AC%E5%9C%B0%E8%B5%84%E6%BA%90%E5%8C%85%E4%B8%8B%E8%BD%BD%E6%9B%B4%E6%96%B0%E6%9C%BA%E5%88%B6/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">本地资源包下载更新机制</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A1%86%E6%9E%B6%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">框架结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#AFURLSessionManager"><span class="toc-number">2.</span> <span class="toc-text">AFURLSessionManager</span></a></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: '',
+      conf: ''
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/2022/12/23/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E5%BA%8F%E5%88%97%E5%8C%96/" title="上一篇: AFNetworking底层原理解析之序列化.md">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/2022/09/14/%E6%9C%AC%E5%9C%B0%E8%B5%84%E6%BA%90%E5%8C%85%E4%B8%8B%E8%BD%BD%E6%9B%B4%E6%96%B0%E6%9C%BA%E5%88%B6/" title="下一篇: 本地资源包下载更新机制">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2022/12/29/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8BAFSecurityPolicy/">AFNetworking底层原理解析之AFSecurityPolicy.md</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/12/23/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E5%BA%8F%E5%88%97%E5%8C%96/">AFNetworking底层原理解析之序列化.md</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/12/03/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B/">AFNetworking底层原理解析之请求流程.md</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/09/14/%E6%9C%AC%E5%9C%B0%E8%B5%84%E6%BA%90%E5%8C%85%E4%B8%8B%E8%BD%BD%E6%9B%B4%E6%96%B0%E6%9C%BA%E5%88%B6/">本地资源包下载更新机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/08/15/%E9%A1%B9%E7%9B%AE%E7%BB%84%E4%BB%B6%E5%8C%96%E6%B7%BB%E5%8A%A0%E6%A8%A1%E5%9D%97/">项目组件化添加模块</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/08/11/LaunchScreen/">LaunchScreen</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/07/08/Https%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B/">Https四次握手</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/07/08/NSURLComponents/">NSURLComponents</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/07/03/appStore%E5%AE%A1%E6%A0%B8%E8%B8%A9%E5%9D%91%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD/">appStore审核踩坑未完待续</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/06/29/TCP%E5%8D%8F%E8%AE%AE%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/">TCP协议三次握手和四次挥手</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/06/13/%E4%B8%80%E9%94%AE%E7%99%BB%E5%BD%95%E5%8A%9F%E8%83%BD%E5%B0%8F%E7%BB%93/">一键登录功能小结</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/06/03/githubusercontent443/">githubusercontent443</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/05/01/fastlane%E8%87%AA%E5%8A%A8%E6%89%93%E5%8C%85%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B/">fastlane自动打包详细流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/04/03/selector%20%E3%80%81SEL%20%E3%80%81@selector(SEL%E5%8E%9F%E7%90%86)/">selector 、SEL 、@selector(SEL原理)</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/03/03/iOS%E5%86%85%E8%B4%AD%E6%80%BB%E7%BB%93/">iOS内购总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/18/%E4%BB%A3%E7%90%86-%E9%80%9A%E7%9F%A5-Block%E7%9A%84%E5%8C%BA%E5%88%AB/">代理-通知-Block的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/13/NSNotificationCenter%E9%80%9A%E7%9F%A5%E7%9A%84%E5%8E%9F%E7%90%86/">NSNotificationCenter通知的原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/01/iOS%E5%9B%BE%E7%89%87%E5%83%8F%E7%B4%A0RGBA%E5%A4%84%E7%90%86/">iOS图片像素RGBA处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/01/autorelease%E5%92%8CAutoreleasepool/">autorelease和Autoreleasepool</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/01/%E4%BB%80%E4%B9%88%E6%98%AF%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0/">什么是内联函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/12/29/%E9%93%B6%E8%A1%8C%E5%AE%B6%E7%AE%97%E6%B3%95/">银行家算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/12/01/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/">时间复杂度</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/11/15/iOS%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">iOS内存管理</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/11/06/MQTT%E8%AF%A6%E8%A7%A3%E5%8F%8A%E4%BD%BF%E7%94%A8/">MQTT详解及使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/11/03/XMPP%E4%B8%8EMQTT%E5%8C%BA%E5%88%AB/">XMPP与MQTT区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/10/06/%E7%BA%BF%E7%A8%8B%E5%92%8C%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB/">线程和进程的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/09/16/%E7%BA%BF%E7%A8%8B%E6%AD%BB%E9%94%81%E7%9A%84%E5%9B%9B%E4%B8%AA%E6%9D%A1%E4%BB%B6/">线程死锁的四个条件</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/08/15/GCD%E8%AF%A6%E8%A7%A3/">GCD详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/07/11/pthread-NSThread-GCD%E7%9A%84%E5%8C%BA%E5%88%AB/">pthread-NSThread-GCD的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/11/Runtime%E5%BA%94%E7%94%A8/">Runtime应用</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/10/Runtime%E6%B6%88%E6%81%AF%E5%8F%91%E9%80%81%E5%92%8C%E6%B6%88%E6%81%AF%E8%BD%AC%E5%8F%91/">Runtime消息发送和消息转发</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/06/Category/">Category</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/03/Runtime%E5%9F%BA%E6%9C%AC%E4%BA%86%E8%A7%A3/">Runtime基本了解</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/01/%E5%AF%B9%E8%B1%A1%E3%80%81%E7%B1%BB%E3%80%81%E5%85%83%E7%B1%BB%E7%9A%84%E5%85%B3%E7%B3%BB/">对象、类、元类的关系</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/05/12/iOS%E7%BC%96%E5%86%99%E8%A7%84%E8%8C%83%E6%80%BB%E7%BB%93/">iOS编写规范总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/04/12/RunLoop%E5%BA%95%E5%B1%82/">RunLoop底层</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/12/iOS%E6%8E%A8%E9%80%81%E5%8E%9F%E7%90%86/">iOS推送原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/02/Pod%E4%B8%AD%E8%8E%B7%E5%8F%96%E5%9B%BE%E7%89%87%E8%BF%9B%E8%A1%8C%E5%80%8D%E5%9B%BE%E7%9A%84%E9%80%82%E9%85%8D/">Pod中获取图片进行倍图的适配</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/02/iCarousel%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E/">iCarousel使用说明</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/01/setValue%E5%92%8CsetObject%E7%9A%84%E5%8C%BA%E5%88%AB/">setValue和setObject的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/21/BeeHive%E6%A1%86%E6%9E%B6%E7%90%86%E8%A7%A3/">BeeHive框架理解</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/20/iOS%E6%8C%81%E4%B9%85%E5%8C%96%E6%96%B9%E5%BC%8F/">setValue和setObject的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/10/app%E6%89%93%E5%BC%80%E5%B0%8F%E7%A8%8B%E5%BA%8F/">setValue和setObject的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/01/KVO/">KVO</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/12/21/KVC/">KVC</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/10/11/%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE%E5%9B%A2%E9%98%9F%E7%9A%84%E5%85%AC%E5%85%B1%E7%BB%84%E4%BB%B6%E7%A7%81%E6%9C%89%E5%BA%93/">创建项目团队的公共组件私有库</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/09/12/git%E5%88%9B%E5%BB%BA%E7%89%88%E6%9C%AC%E5%BA%93%E5%91%BD%E4%BB%A4/">git创建版本库命令</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/08/12/%E6%9C%AC%E5%9C%B0%E7%A7%81%E6%9C%89%E5%BA%93%E5%88%9B%E5%BB%BA%E4%B8%8E%E4%BD%BF%E7%94%A8/">本地私有库创建与使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/06/12/Block%E5%8E%9F%E7%90%86%E4%BB%A5%E5%8F%8A%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8%E9%97%AE%E9%A2%98/">Block原理以及循环引用问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/05/15/FOUNDATION_EXTERN,UIKIT_EXTERN,#define,static%E5%85%B3%E9%94%AE%E5%AD%97/">FOUNDATION_EXTERN,UIKIT_EXTERN,#define,static关键字</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/15/OC%E4%B8%ADweak%E7%9A%84%E7%90%86%E8%A7%A3/">OC中weak的理解</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/03/25/%E5%93%88%E5%B8%8C%E8%A1%A8/">哈希表</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/03/15/atomic%E5%92%8Cnonatomic%E5%8C%BA%E5%88%AB/">atomic和nonatomic区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/02/11/copy%E5%92%8CmutableCopy/">copy和mutableCopy</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/01/09/nil-Nil-NULL-NSNull/">nil-Nil-NULL-NSNull</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/01/05/property%E3%80%81synthesize%E3%80%81dynamic/">property、synthesize、dynamic</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/15/iOS%E7%AD%BE%E5%90%8D%E8%AE%A4%E8%AF%81%E8%BF%87%E7%A8%8B/">iOS签名认证过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/08/removeFromSuperview%E8%AF%A6%E8%A7%A3/">removeFromSuperview详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/01/iOS%E5%93%8D%E5%BA%94%E9%93%BE%E4%B9%8B%E4%BA%8B%E4%BB%B6%E4%BC%A0%E9%80%92%E5%92%8C%E5%93%8D%E5%BA%94/">iOS响应链之事件传递和响应</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/17/iOSView%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/">iOSView的生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/10/Hexo%E4%BD%BF%E7%94%A8/">Hexo使用</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2024 Haven
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo &nbsp;&nbsp;</a><a href="https://github.com/maochunguang" target="_blank">Blog</a> by tommy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

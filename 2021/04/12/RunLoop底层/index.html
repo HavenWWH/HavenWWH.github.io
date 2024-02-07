@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl"/>
+  
+  
+  
+  
+  <title>RunLoop底层 | Haven的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="RunLoop">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RunLoop底层">
+<meta property="og:url" content="https://havenwwh.github.io/2021/04/12/RunLoop%E5%BA%95%E5%B1%82/index.html">
+<meta property="og:site_name" content="Haven的博客">
+<meta property="og:description" content="RunLoop">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://havenwwh.github.io/images/RunLoop%E5%BA%95%E5%B1%821.png">
+<meta property="og:image" content="https://havenwwh.github.io/images/RunLoop%E5%BA%95%E5%B1%822.png">
+<meta property="article:published_time" content="2021-04-12T14:34:13.000Z">
+<meta property="article:modified_time" content="2021-04-12T14:34:13.000Z">
+<meta property="article:author" content="Haven">
+<meta property="article:tag" content="原理">
+<meta property="article:tag" content="线程">
+<meta property="article:tag" content="底层">
+<meta property="article:tag" content="RunLoop">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://havenwwh.github.io/images/RunLoop%E5%BA%95%E5%B1%821.png">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.png" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Haven</a></h1>
+        </hgroup>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">主页</a></li>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/tags">标签</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/HavenWWH" title="github">github</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Block/" style="font-size: 11.43px;">Block</a> <a href="/tags/Category/" style="font-size: 10px;">Category</a> <a href="/tags/Deadlock/" style="font-size: 10px;">Deadlock</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Https/" style="font-size: 10px;">Https</a> <a href="/tags/KVC/" style="font-size: 10px;">KVC</a> <a href="/tags/KVO/" style="font-size: 10px;">KVO</a> <a href="/tags/O-n/" style="font-size: 10px;">O(n)</a> <a href="/tags/Rumtime/" style="font-size: 10px;">Rumtime</a> <a href="/tags/RunLoop/" style="font-size: 10px;">RunLoop</a> <a href="/tags/Runtime/" style="font-size: 15.71px;">Runtime</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/git/" style="font-size: 11.43px;">git</a> <a href="/tags/%E4%BB%A3%E7%90%86/" style="font-size: 10px;">代理</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/" style="font-size: 10px;">代码规范</a> <a href="/tags/%E5%83%8F%E7%B4%A0/" style="font-size: 10px;">像素</a> <a href="/tags/%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0/" style="font-size: 10px;">内联函数</a> <a href="/tags/%E5%87%BD%E6%95%B0%E7%9A%84%E8%B0%83%E7%94%A8/" style="font-size: 10px;">函数的调用</a> <a href="/tags/%E5%88%86%E7%B1%BB/" style="font-size: 10px;">分类</a> <a href="/tags/%E5%8A%9F%E8%83%BD%E7%82%B9/" style="font-size: 11.43px;">功能点</a> <a href="/tags/%E5%8D%8F%E8%AE%AE/" style="font-size: 17.14px;">协议</a> <a href="/tags/%E5%8E%9F%E7%90%86/" style="font-size: 18.57px;">原理</a> <a href="/tags/%E5%91%BD%E4%BB%A4/" style="font-size: 10px;">命令</a> <a href="/tags/%E5%93%8D%E5%BA%94%E9%93%BE/" style="font-size: 10px;">响应链</a> <a href="/tags/%E5%9B%BE%E7%89%87/" style="font-size: 12.86px;">图片</a> <a href="/tags/%E5%9F%BA%E7%A1%80/" style="font-size: 12.86px;">基础</a> <a href="/tags/%E5%B8%B8%E8%AF%86/" style="font-size: 10px;">常识</a> <a href="/tags/%E5%BA%95%E5%B1%82/" style="font-size: 10px;">底层</a> <a href="/tags/%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8/" style="font-size: 10px;">循环引用</a> <a href="/tags/%E6%8E%A8%E9%80%81/" style="font-size: 10px;">推送</a> <a href="/tags/%E6%8F%92%E4%BB%B6%E9%AA%8C%E8%AF%81/" style="font-size: 10px;">插件验证</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 10px;">数据库</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 10px;">数据结构</a> <a href="/tags/%E6%97%A5%E5%B8%B8%E8%B8%A9%E5%9D%91/" style="font-size: 11.43px;">日常踩坑</a> <a href="/tags/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" style="font-size: 10px;">时间复杂度</a> <a href="/tags/%E6%9C%AC%E5%9C%B0%E5%8C%96%E5%AD%98%E5%82%A8/" style="font-size: 10px;">本地化存储</a> <a href="/tags/%E6%A1%86%E6%9E%B6/" style="font-size: 10px;">框架</a> <a href="/tags/%E6%B6%88%E6%81%AF/" style="font-size: 14.29px;">消息</a> <a href="/tags/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" style="font-size: 10px;">生命周期</a> <a href="/tags/%E7%9F%A5%E8%AF%86%E7%82%B9/" style="font-size: 20px;">知识点</a> <a href="/tags/%E7%A7%81%E6%9C%89%E5%BA%93/" style="font-size: 11.43px;">私有库</a> <a href="/tags/%E7%AD%BE%E5%90%8D%E8%AE%A4%E8%AF%81/" style="font-size: 10px;">签名认证</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 11.43px;">算法</a> <a href="/tags/%E7%BA%BF%E7%A8%8B/" style="font-size: 12.86px;">线程</a> <a href="/tags/%E7%BB%84%E4%BB%B6%E5%8C%96/" style="font-size: 12.86px;">组件化</a> <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85/" style="font-size: 10px;">自动化打包</a> <a href="/tags/%E8%AF%81%E4%B9%A6/" style="font-size: 10px;">证书</a> <a href="/tags/%E8%B5%84%E6%BA%90%E4%B8%8B%E8%BD%BD/" style="font-size: 10px;">资源下载</a> <a href="/tags/%E8%B8%A9%E5%9D%91%E6%97%A5%E5%B8%B8/" style="font-size: 10px;">踩坑日常</a> <a href="/tags/%E9%80%82%E9%85%8D/" style="font-size: 11.43px;">适配</a> <a href="/tags/%E9%80%9A%E7%9F%A5/" style="font-size: 10px;">通知</a> <a href="/tags/%E9%93%BE%E6%8E%A5%E8%B7%B3%E8%BD%AC/" style="font-size: 10px;">链接跳转</a> <a href="/tags/%E9%94%81/" style="font-size: 10px;">锁</a>
+                    </div>
+                </section>
+                
+                
+                
+                
+                <section class="switch-part switch-part3">
+                
+                    <div id="js-aboutme">爱好很多的程序员</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Haven</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.png" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Haven</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags">标签</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/HavenWWH" title="github">github</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-RunLoop底层" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2021/04/12/RunLoop%E5%BA%95%E5%B1%82/" class="article-date">
+      <time datetime="2021-04-12T14:34:13.000Z" itemprop="datePublished">2021-04-12</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      RunLoop底层
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/iOS/">iOS</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RunLoop/" rel="tag">RunLoop</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8E%9F%E7%90%86/" rel="tag">原理</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BA%95%E5%B1%82/" rel="tag">底层</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BA%BF%E7%A8%8B/" rel="tag">线程</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>RunLoop</p>
+<span id="more"></span>
+
+<p>RunLoop运行循环, RunLoop实际上是一个对象，这个对象在运行循环中用来处理程序运行过程中出现的各种事件（比如说触摸事件、UI刷新事件、定时器事件、Selector事件），从而保持程序的持续运行, 没事就进入睡眠, 有事件唤醒就进入工作, 也就是在需要的时候工作, 尽最大限度的节省CPU资源,提高程序性能。</p>
+<h3 id="RunLoop与线程的关系"><a href="#RunLoop与线程的关系" class="headerlink" title="RunLoop与线程的关系"></a>RunLoop与线程的关系</h3><p>先看看官方的图片说明:<br><img src="/images/RunLoop%E5%BA%95%E5%B1%821.png" alt="RunLoop底层"></p>
+<p>从上图中可以看出，RunLoop是线程中的一个循环，RunLoop会在循环中会不断检测，通过 Input sources（输入源）和 Timer sources（定时源）两种来源等待接受事件；然后对接受到的事件通知线程进行处理，并在没有事件的时候让线程进行休息</p>
+<p>所以RunLoop 和线程是息息相关的, 具体体现在以下几个方面</p>
+<ul>
+<li>每个线程都有唯一的一个与之对应的一个RunLoop, 只能在线程内部获取,第一次创建时获取, 线程结束时销毁, 不包括主线程</li>
+<li>主线程对应的RunLoop不会被销毁，而且是默认启动的, 这样就保证了程序的持续运行</li>
+<li>RunLoop保存在一个全局的Dictionary里，线程作为key,RunLoop作为value</li>
+</ul>
+<h3 id="RunLoop对象以及相关类-核心是5个类"><a href="#RunLoop对象以及相关类-核心是5个类" class="headerlink" title="RunLoop对象以及相关类(核心是5个类)"></a>RunLoop对象以及相关类(核心是5个类)</h3><ul>
+<li>CFRunLoopRef：代表 RunLoop 的对象</li>
+<li>CFRunLoopModeRef：代表 RunLoop 的运行模式</li>
+<li>CFRunLoopSourceRef：就是 RunLoop 模型图中提到的输入源 / 事件源</li>
+<li>CFRunLoopTimerRef：就是 RunLoop 模型图中提到的定时源</li>
+<li>CFRunLoopObserverRef：观察者，能够监听 RunLoop 的状态改变</li>
+</ul>
+<h4 id="CFRunLoopRef"><a href="#CFRunLoopRef" class="headerlink" title="CFRunLoopRef"></a>CFRunLoopRef</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">struct __CFRunLoop &#123;</span><br><span class="line">    CFRuntimeBase _base;</span><br><span class="line">    pthread_mutex_t _lock;  /* locked for accessing mode list */</span><br><span class="line">    __CFPort _wakeUpPort;   // used for CFRunLoopWakeUp 内核向该端口发送消息可以唤醒runloop</span><br><span class="line">    Boolean _unused;</span><br><span class="line">    volatile _per_run_data *_perRunData; // reset for runs of the run loop</span><br><span class="line">    pthread_t _pthread;             //RunLoop对应的线程</span><br><span class="line">    uint32_t _winthread;</span><br><span class="line">    CFMutableSetRef _commonModes;    //存储的是字符串，记录所有标记为common的mode</span><br><span class="line">    CFMutableSetRef _commonModeItems;//存储所有commonMode的item(source、timer、observer)</span><br><span class="line">    CFRunLoopModeRef _currentMode;   //当前运行的mode</span><br><span class="line">    CFMutableSetRef _modes;          //存储的是CFRunLoopModeRef</span><br><span class="line">    struct _block_item *_blocks_head;//doblocks的时候用到</span><br><span class="line">    struct _block_item *_blocks_tail;</span><br><span class="line">    CFTypeRef _counterpart;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="CFRunLoopModeRef"><a href="#CFRunLoopModeRef" class="headerlink" title="CFRunLoopModeRef"></a>CFRunLoopModeRef</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. kCFRunLoopDefaultMode：App的默认运行模式，通常主线程是在这个运行模式下运行</span><br><span class="line">2. UITrackingRunLoopMode：跟踪用户交互事件（用于 ScrollView 追踪触摸滑动，保证界面滑动时不受其他Mode影响）</span><br><span class="line">3. UIInitializationRunLoopMode：在刚启动App时第进入的第一个 Mode，启动完成后就不再使用</span><br><span class="line">4. GSEventReceiveRunLoopMode：接受系统内部事件，通常用不到</span><br><span class="line">5. kCFRunLoopCommonModes：伪模式，不是一种真正的运行模式（后边会用到）</span><br></pre></td></tr></table></figure>
+<p>CFRunLoopModeRef结构体</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">typedef struct __CFRunLoopMode *CFRunLoopModeRef;</span><br><span class="line">struct __CFRunLoopMode &#123;</span><br><span class="line">    CFRuntimeBase _base;</span><br><span class="line">    pthread_mutex_t _lock;  /* must have the run loop locked before locking this */</span><br><span class="line">    CFStringRef _name;</span><br><span class="line">    Boolean _stopped;</span><br><span class="line">    char _padding[3];</span><br><span class="line">    CFMutableSetRef _sources0;</span><br><span class="line">    CFMutableSetRef _sources1;</span><br><span class="line">    CFMutableArrayRef _observers;</span><br><span class="line">    CFMutableArrayRef _timers;</span><br><span class="line">    CFMutableDictionaryRef _portToV1SourceMap;</span><br><span class="line">    __CFPortSet _portSet;</span><br><span class="line">    CFIndex _observerMask;</span><br><span class="line">#if USE_DISPATCH_SOURCE_FOR_TIMERS</span><br><span class="line">    dispatch_source_t _timerSource;</span><br><span class="line">    dispatch_queue_t _queue;</span><br><span class="line">    Boolean _timerFired; // set to true by the source when a timer has fired</span><br><span class="line">    Boolean _dispatchTimerArmed;</span><br><span class="line">#endif</span><br><span class="line">#if USE_MK_TIMER_TOO</span><br><span class="line">    mach_port_t _timerPort;</span><br><span class="line">    Boolean _mkTimerArmed;</span><br><span class="line">#endif</span><br><span class="line">#if DEPLOYMENT_TARGET_WINDOWS</span><br><span class="line">    DWORD _msgQMask;</span><br><span class="line">    void (*_msgPump)(void);</span><br><span class="line">#endif</span><br><span class="line">    uint64_t _timerSoftDeadline; /* TSR */</span><br><span class="line">    uint64_t _timerHardDeadline; /* TSR */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>一个Runloop包含若干个Mode，每个Mode包含若干个Source/Timer/Observer,，每个Mode都是独立的，而且Runloop只能选择一个mode运行(currentMode)。如果需要切换 Mode，需要退出RunLoop指定Mode再重新进入RunLoop,这样做主要是为了分隔开不同组的 Source/Timer/Observer，让其互不影响, 一个RunLoop的Mode必须至少有一个sources或者Timer, 否则此Mode视为空Mode, 当RunLoop切换到空Mode时会退出RunLoop</p>
+<p>RunLoop关键属性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CFMutableSetRef _sources0; // 触摸事件,点击事件，PerformSelectors事件</span><br><span class="line">CFMutableSetRef _sources1; // 基于Port的线程间通信</span><br><span class="line">CFMutableArrayRef _observers; // 监听者,监听RunLoop的状态</span><br><span class="line">CFMutableArrayRef _timers; // 定时器</span><br></pre></td></tr></table></figure>
+<h4 id="CFRunLoopTimerRef"><a href="#CFRunLoopTimerRef" class="headerlink" title="CFRunLoopTimerRef"></a>CFRunLoopTimerRef</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CFRunLoopTimerRef是定时源 </span><br><span class="line">```  </span><br><span class="line"></span><br><span class="line">#### CFRunLoopSourceRef</span><br></pre></td></tr></table></figure>
+<p>CFRunLoopSourceRef是事件源</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line">以前的分法</span><br><span class="line">1、Port-Based Sources (基于端口的)</span><br><span class="line">2、Custom Input Sources (用户自定义输入源)</span><br><span class="line">3、Cocoa Perform Selector Sources（Perform Selector方法事件源）</span><br><span class="line">现在的分法</span><br><span class="line">1、Source0：非基于Port的 ，用于用户主动触发事件</span><br><span class="line">Source0是App内部事件，由App自己管理的UIEvent、CFSocket都是source0。当一个source0事件准备执行的时候，必须要先把它标记为signal状态</span><br><span class="line">2、Source1：基于Port的，通过内核和其它线程相互发送消息</span><br></pre></td></tr></table></figure>
+
+<h4 id="CFRunLoopObserverRef"><a href="#CFRunLoopObserverRef" class="headerlink" title="CFRunLoopObserverRef"></a>CFRunLoopObserverRef</h4><p>CFRunLoopObserverRef是观察者，用来监听RunLoop的状态改变<br>CFRunLoopObserverRef可以监听的状态改变有以下几种：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) &#123;</span><br><span class="line">    kCFRunLoopEntry = (1UL &lt;&lt; 0),               // 即将进入Loop：1</span><br><span class="line">    kCFRunLoopBeforeTimers = (1UL &lt;&lt; 1),        // 即将处理Timer：2    </span><br><span class="line">    kCFRunLoopBeforeSources = (1UL &lt;&lt; 2),       // 即将处理Source：4</span><br><span class="line">    kCFRunLoopBeforeWaiting = (1UL &lt;&lt; 5),       // 即将进入休眠：32</span><br><span class="line">    kCFRunLoopAfterWaiting = (1UL &lt;&lt; 6),        // 即将从休眠中唤醒：64</span><br><span class="line">    kCFRunLoopExit = (1UL &lt;&lt; 7),                // 即将从Loop中退出：128</span><br><span class="line">    kCFRunLoopAllActivities = 0x0FFFFFFFU       // 监听全部状态改变  </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>引用前辈的图片来说明Runloop的原理<br><img src="/images/RunLoop%E5%BA%95%E5%B1%822.png" alt="RunLoop原理"></p>
+<pre><code>1. 通知Observer: RunLoop被触发
+2. 如果有timers事件的话，通知Observer,准备处理timers事件
+3. 如果有source0要处理的话，通知Observer,准备处理sources0事件
+4. 执行所有可以执行的source0事件
+5. 如果存在source1,则跳转#到第9步
+6. 通知Observer: Runloop将进入休眠状态
+7. Runloop进入休眠状态并继续监听RunLoop状态的改变
+8. 通知Observer，Runloop被唤醒(除了source0事件)
+9. 如果Runloop是被唤醒，判断哪种方式唤醒,跳转到2
+    9.1 如果是timer唤醒,则处理timer
+    9.2 如果是(GCD)dispatchPort唤醒，则处理GCD事件
+    9.3 如果是source1唤醒，则处理Source1事件
+10. 继续循环或者通知Observer: Runloop将要退出
+</code></pre>
+<h3 id="RunLoop在开发中对应用"><a href="#RunLoop在开发中对应用" class="headerlink" title="RunLoop在开发中对应用"></a>RunLoop在开发中对应用</h3><h4 id="线程保活-设置常驻线程"><a href="#线程保活-设置常驻线程" class="headerlink" title="线程保活(设置常驻线程)"></a>线程保活(设置常驻线程)</h4><p>正常情况下, 正常一个线程创建出来，运行完要做的事情，线程就会销毁, 如果我们需要这个线程一直存在, 需要怎么处理呢?<br>比如AFNetwork中检测网络状态的线程肯定是常驻线程,因为需要时刻监听网络状态的改变<br>根据RunLoop的了解,只要线程中创建RunLoop就行了</p>
+<p>创建常驻线程:</p>
+<ul>
+<li>NSThread+RunLoop的方式, 添加一个input source 或者 直接添加一个定时器</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">@property (nonatomic,strong) NSThread *thread;</span><br><span class="line"></span><br><span class="line">// 创建线程</span><br><span class="line">self.thread = [[NSThread alloc] initWithTarget:self selector:@selector(run) object:nil];</span><br><span class="line">[self.thread start];</span><br><span class="line"></span><br><span class="line">// 让线程保活</span><br><span class="line">- (void)run &#123;</span><br><span class="line">    //只要往RunLoop中添加了timer、source或者observer就会继续执行，一个Run Loop通常必须包含一个输入源或者定时器来监听事件，如果一个都没有，Run Loop启动后立即退出。</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">    </span><br><span class="line">    //1、添加一个input source</span><br><span class="line">    [[NSRunLoop currentRunLoop] addPort:[NSPort port] forMode:NSDefaultRunLoopMode];</span><br><span class="line">    [[NSRunLoop currentRunLoop] run];</span><br><span class="line">    </span><br><span class="line">    //2、添加一个定时器</span><br><span class="line">    //    NSTimer *timer = [NSTimer timerWithTimeInterval:2.0 target:self selector:@selector(test) userInfo:nil repeats:YES];</span><br><span class="line">    //    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];</span><br><span class="line">    //    [[NSRunLoop currentRunLoop] run];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 利用常驻线程做事</span><br><span class="line">[self performSelector:@selector(action) onThread:self.thread withObject:nil waitUntilDone:NO ];</span><br></pre></td></tr></table></figure>
+<ul>
+<li>NSThread+信号量<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">-(void)doAction:(dispatch_block_t)action;</span><br><span class="line">-(void)cancel;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    NSMutableArray *actions;</span><br><span class="line">    NSThread *thread;</span><br><span class="line">    dispatch_semaphore_t sem;</span><br><span class="line">    bool cancel;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(id)createThread &#123;</span><br><span class="line"></span><br><span class="line">    actions = [NSMutableArray array];</span><br><span class="line">    // 创建信号量</span><br><span class="line">    sem = dispatch_semaphore_create(0);</span><br><span class="line">    // 创建一个新线程</span><br><span class="line">    thread = [[NSThread alloc] initWithTarget:self selector:@selector(run) object:nil];</span><br><span class="line">    [thread start];</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(void)run &#123;</span><br><span class="line"></span><br><span class="line">    while (true) &#123;</span><br><span class="line">    </span><br><span class="line">        // 等待信号量,信号量减1</span><br><span class="line">        dispatch_semaphore_wait(sem, -1);</span><br><span class="line">        // 收到信号</span><br><span class="line">        // 如果线程已经取消了，那么退出循环</span><br><span class="line">        if(cancel)&#123;</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        // 开始执行任务</span><br><span class="line">        dispatch_block_t block = [actions firstObject];</span><br><span class="line">        if(block)&#123;</span><br><span class="line">            [actions removeObject:block];</span><br><span class="line">            block();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 执行某个任务</span><br><span class="line">-(void)doAction:(dispatch_block_t)action&#123;</span><br><span class="line">    if(!cancel) &#123; // 如果线程已经cancel了，那么直接忽略</span><br><span class="line">        // 将任务放入数组</span><br><span class="line">        [actions addObject:[action copy]];</span><br><span class="line">        // 发送信号，信号量加1</span><br><span class="line">        dispatch_semaphore_signal(sem);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 终止常驻线程</span><br><span class="line">-(void)cancel &#123;</span><br><span class="line"></span><br><span class="line">    cancel = YES;</span><br><span class="line">    // 线程取消后，清空所有的回调</span><br><span class="line">    [actions removeAllObjects];</span><br><span class="line">    // 相当于发送一个终止任务的信号</span><br><span class="line">    dispatch_semaphore_signal(sem);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="自动释放池"><a href="#自动释放池" class="headerlink" title="自动释放池"></a>自动释放池</h4></li>
+</ul>
+<p>Timer和Source也是一些变量，变量就要占用存储空间, 如果不释放掉，占用的内存也就越来越大，所以RunLoop中也有自动释放池来处理这个问题<br>RunLoop内部有一个自动释放池，当RunLoop开启时，就会自动创建一个自动释放池，当RunLoop在休息之前会释放掉自动释放池的东西，然后重新创建一个新的空的自动释放池，当RunLoop被唤醒重新开始跑圈时，Timer,Source等新的事件就会放到新的自动释放池中，当RunLoop退出的时候也会被释放。<br>注意：只有主线程的RunLoop会默认启动。也就意味着会自动创建自动释放池，子线程需要在线程调度方法中手动添加自动释放池。</p>
+<h4 id="PerformSelecter"><a href="#PerformSelecter" class="headerlink" title="PerformSelecter"></a>PerformSelecter</h4><p>performSelecter:afterDelay: 后，其内部会创建一个 Timer 并添加到当前线程的 RunLoop 中。所以如果当前线程没有 RunLoop，则这个方法会失效<br>performSelector:onThread:时，会创建一个 Timer 加到对应的线程去，对应线程没有 RunLoop 该方法也会失效</p>
+<h4 id="事件响应"><a href="#事件响应" class="headerlink" title="事件响应"></a>事件响应</h4><p>苹果注册了一个 Source1 (基于 mach port 的) 用来接收系统事件) 当一个硬件事件(触摸/锁屏/摇晃等)发生后, Source1 就会触发回调。</p>
+<h4 id="手势识别"><a href="#手势识别" class="headerlink" title="手势识别"></a>手势识别</h4><p>当上面的 _UIApplicationHandleEventQueue() 识别了一个手势时，其首先会调用 Cancel 将当前的 touchesBegin/Move/End 系列回调打断。随后系统将对应的 UIGestureRecognizer 标记为待处理。<br>苹果注册了一个 Observer 监测 BeforeWaiting (Loop即将进入休眠) 事件，这个Observer的回调函数是 _UIGestureRecognizerUpdateObserver()，其内部会获取所有刚被标记为待处理的 GestureRecognizer，并执行GestureRecognizer的回调。<br>当有 UIGestureRecognizer 的变化(创建/销毁/状态改变)时，这个回调都会进行相应处理</p>
+<h4 id="界面更新"><a href="#界面更新" class="headerlink" title="界面更新"></a>界面更新</h4><p>当在操作 UI 时，比如改变了 Frame、更新了 UIView/CALayer 的层次时，或者手动调用了 UIView/CALayer 的 setNeedsLayout/setNeedsDisplay方法后，这个 UIView/CALayer 就被标记为待处理。</p>
+<p>苹果注册了一个 Observer 监听 BeforeWaiting(即将进入休眠) 和 Exit (即将退出Loop) 事件，会执行一个很长的函数：<br>_ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv()。这个函数里会遍历所有待处理的 UIView/CAlayer 以执行实际的绘制和调整，并更新 UI 界面。</p>
+<h4 id="NSTimer和RunLoop的关系"><a href="#NSTimer和RunLoop的关系" class="headerlink" title="NSTimer和RunLoop的关系"></a>NSTimer和RunLoop的关系</h4><p>NSTimer为了保证调用方法中对象的生命周期,NSTimer会对外界对象进行一次Retain, 这也是为什么NSTimer需要手动销毁invalidate的原因,如果不手动销毁,无法自动释放, NSTimer默认是添加到主线程对RunLoop中的, 如果在子线程中添加NSTimer需要手动开启RunLoop</p>
+<h4 id="为什么NSTimer可能存在不准的情况"><a href="#为什么NSTimer可能存在不准的情况" class="headerlink" title="为什么NSTimer可能存在不准的情况?"></a>为什么NSTimer可能存在不准的情况?</h4><p>因为NSTimer是添加到主线程的RunLoop中的,如果定时器触发的那次在RunLoop中做了耗时的操作，当前RunLoop持续的时间超过了定时器的间隔时间(例如做For循环)，那么下一次定时就被延后了, 就造成, 解决办法可以在子线程中创建NSTimer<br>回主线程刷新UI, 或者用其他的方法创建定时器, GCD, CADisplayLink, mach_absolute_time()精度都比NSTimer要高</p>
+<h4 id="为什么滚动scorellView的时候-NSTimer定时不走呢"><a href="#为什么滚动scorellView的时候-NSTimer定时不走呢" class="headerlink" title="为什么滚动scorellView的时候, NSTimer定时不走呢?"></a>为什么滚动scorellView的时候, NSTimer定时不走呢?</h4><p>当我们不做任何操作的时候，RunLoop处于NSDefaultRunLoopMode下。<br>而当我们滚动scorellView的时候，RunLoop就结束NSDefaultRunLoopMode，切换到了UITrackingRunLoopMode模式下，这个模式下没有添加NSTimer，所以我们的NSTimer就不工作了。<br>但当我们松开鼠标的时候，RunLoop就结束UITrackingRunLoopMode模式，又切换回NSDefaultRunLoopMode模式，所以NSTimer就又开始正常工作了。</p>
+<h4 id="GCD和RunLoop的关系"><a href="#GCD和RunLoop的关系" class="headerlink" title="GCD和RunLoop的关系"></a>GCD和RunLoop的关系</h4><p>RunLoop本身和GCD并没有直接的关系。当调用了dispatch_async(dispatch_get_main_queue(), &lt;#^(void)block#&gt;)时libDispatch会向主线程RunLoop发送消息唤醒RunLoop，RunLoop从消息中获取block，并且在CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE回调里执行这个block。不过这个操作仅限于主线程，其他线程dispatch操作是全部由libDispatch驱动的。</p>
+<h4 id="NSTimer-与-GCD-Timer、CADisplayLink"><a href="#NSTimer-与-GCD-Timer、CADisplayLink" class="headerlink" title="NSTimer 与 GCD Timer、CADisplayLink"></a>NSTimer 与 GCD Timer、CADisplayLink</h4><ul>
+<li>NSTimer  </li>
+</ul>
+<p>Timer Source作为事件源，事实上它的上层对应就是NSTimer（其实就是CFRunloopTimerRef）这个开发者经常用到的定时器（底层基于使用mk_timer实现）</p>
+<p>NSTimer 其实就是 CFRunLoopTimerRef，一个 NSTimer 注册到 RunLoop 后，RunLoop 会为其重复的时间点注册好事件。RunLoop为了节省资源，并不会在非常准确的时间点回调这个Timer。Timer 有个属性叫做 Tolerance (宽容度)，标示了当时间点到后，容许有多少最大误差。由于 NSTimer 的这种机制，因此 NSTimer 的执行必须依赖于 RunLoop，如果没有 RunLoop，NSTimer 是不会执行的。</p>
+<p>NSTimer为什么会存在不准的情况, 也跟RunLoop有关系</p>
+<ul>
+<li>GCD Timer</li>
+</ul>
+<p>GCD 则不同，GCD 的线程管理是通过系统来直接管理的。GCD Timer 是通过 dispatch port 给 RunLoop 发送消息，来使 RunLoop 执行相应的 block，如果所在线程没有 RunLoop，那么 GCD 会临时创建一个线程去执行 block，执行完之后再销毁掉，因此 GCD 的 Timer 是不依赖 RunLoop 的。</p>
+<p>至于这两个 Timer 的准确性问题，如果不在 RunLoop 的线程里面执行，那么只能使用 GCD Timer，由于 GCD Timer 是基于 MKTimer(mach kernel timer)，已经很底层了，因此是很准确的。</p>
+<p>如果在 RunLoop 的线程里面执行，由于 GCD Timer 和 NSTimer 都是通过 port 发送消息的机制来触发 RunLoop 的，因此准确性差别应该不是很大。如果线程 RunLoop 阻塞了，不管是 GCD Timer 还是 NSTimer 都会存在延迟问题。</p>
+<ul>
+<li>CADisplayLink </li>
+</ul>
+<p>是一个执行频率（fps）和屏幕刷新相同（可以修改preferredFramesPerSecond改变刷新频率）的定时器，它也需要加入到RunLoop才能执行。与NSTimer类似，CADisplayLink同样是基于CFRunloopTimerRef实现，底层使用mk_timer（可以比较加入到RunLoop前后RunLoop中timer的变化）。和NSTimer相比它精度更高（尽管NSTimer也可以修改精度），不过和NStimer类似的是如果遇到大任务它仍然存在丢帧现象。通常情况下CADisaplayLink用于构建帧动画，看起来相对更加流畅，而NSTimer则有更广泛的用处。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2021/04/12/RunLoop%E5%BA%95%E5%B1%82/">RunLoop底层</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Haven 的个人博客">Haven</a></p>
+        <p><span>发布时间:</span>2021年04月12日 - 22时34分</p>
+        <p><span>最后更新:</span>2021年04月12日 - 22时34分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2021/04/12/RunLoop%E5%BA%95%E5%B1%82/" title="RunLoop底层">https://havenwwh.github.io/2021/04/12/RunLoop%E5%BA%95%E5%B1%82/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://havenwwh.github.io/2021/04/12/RunLoop%E5%BA%95%E5%B1%82/　　作者: Haven" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a  href="/2021/05/12/iOS%E7%BC%96%E5%86%99%E8%A7%84%E8%8C%83%E6%80%BB%E7%BB%93/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          iOS编写规范总结
+        
+      </div>
+    </a>
+  
+  
+    <a  href="/2021/02/12/iOS%E6%8E%A8%E9%80%81%E5%8E%9F%E7%90%86/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">iOS推送原理</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#RunLoop%E4%B8%8E%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">1.</span> <span class="toc-text">RunLoop与线程的关系</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RunLoop%E5%AF%B9%E8%B1%A1%E4%BB%A5%E5%8F%8A%E7%9B%B8%E5%85%B3%E7%B1%BB-%E6%A0%B8%E5%BF%83%E6%98%AF5%E4%B8%AA%E7%B1%BB"><span class="toc-number">2.</span> <span class="toc-text">RunLoop对象以及相关类(核心是5个类)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#CFRunLoopRef"><span class="toc-number">2.1.</span> <span class="toc-text">CFRunLoopRef</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CFRunLoopModeRef"><span class="toc-number">2.2.</span> <span class="toc-text">CFRunLoopModeRef</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CFRunLoopTimerRef"><span class="toc-number">2.3.</span> <span class="toc-text">CFRunLoopTimerRef</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CFRunLoopObserverRef"><span class="toc-number">2.4.</span> <span class="toc-text">CFRunLoopObserverRef</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RunLoop%E5%9C%A8%E5%BC%80%E5%8F%91%E4%B8%AD%E5%AF%B9%E5%BA%94%E7%94%A8"><span class="toc-number">3.</span> <span class="toc-text">RunLoop在开发中对应用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E4%BF%9D%E6%B4%BB-%E8%AE%BE%E7%BD%AE%E5%B8%B8%E9%A9%BB%E7%BA%BF%E7%A8%8B"><span class="toc-number">3.1.</span> <span class="toc-text">线程保活(设置常驻线程)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E9%87%8A%E6%94%BE%E6%B1%A0"><span class="toc-number">3.2.</span> <span class="toc-text">自动释放池</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PerformSelecter"><span class="toc-number">3.3.</span> <span class="toc-text">PerformSelecter</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8B%E4%BB%B6%E5%93%8D%E5%BA%94"><span class="toc-number">3.4.</span> <span class="toc-text">事件响应</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%8B%E5%8A%BF%E8%AF%86%E5%88%AB"><span class="toc-number">3.5.</span> <span class="toc-text">手势识别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%95%8C%E9%9D%A2%E6%9B%B4%E6%96%B0"><span class="toc-number">3.6.</span> <span class="toc-text">界面更新</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NSTimer%E5%92%8CRunLoop%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">3.7.</span> <span class="toc-text">NSTimer和RunLoop的关系</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88NSTimer%E5%8F%AF%E8%83%BD%E5%AD%98%E5%9C%A8%E4%B8%8D%E5%87%86%E7%9A%84%E6%83%85%E5%86%B5"><span class="toc-number">3.8.</span> <span class="toc-text">为什么NSTimer可能存在不准的情况?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%BB%9A%E5%8A%A8scorellView%E7%9A%84%E6%97%B6%E5%80%99-NSTimer%E5%AE%9A%E6%97%B6%E4%B8%8D%E8%B5%B0%E5%91%A2"><span class="toc-number">3.9.</span> <span class="toc-text">为什么滚动scorellView的时候, NSTimer定时不走呢?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#GCD%E5%92%8CRunLoop%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">3.10.</span> <span class="toc-text">GCD和RunLoop的关系</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NSTimer-%E4%B8%8E-GCD-Timer%E3%80%81CADisplayLink"><span class="toc-number">3.11.</span> <span class="toc-text">NSTimer 与 GCD Timer、CADisplayLink</span></a></li></ol></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: '',
+      conf: ''
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/2021/05/12/iOS%E7%BC%96%E5%86%99%E8%A7%84%E8%8C%83%E6%80%BB%E7%BB%93/" title="上一篇: iOS编写规范总结">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/2021/02/12/iOS%E6%8E%A8%E9%80%81%E5%8E%9F%E7%90%86/" title="下一篇: iOS推送原理">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2022/12/29/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8BAFSecurityPolicy/">AFNetworking底层原理解析之AFSecurityPolicy.md</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/12/23/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E5%BA%8F%E5%88%97%E5%8C%96/">AFNetworking底层原理解析之序列化.md</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/12/03/AFNetworking%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B/">AFNetworking底层原理解析之请求流程.md</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/09/14/%E6%9C%AC%E5%9C%B0%E8%B5%84%E6%BA%90%E5%8C%85%E4%B8%8B%E8%BD%BD%E6%9B%B4%E6%96%B0%E6%9C%BA%E5%88%B6/">本地资源包下载更新机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/08/15/%E9%A1%B9%E7%9B%AE%E7%BB%84%E4%BB%B6%E5%8C%96%E6%B7%BB%E5%8A%A0%E6%A8%A1%E5%9D%97/">项目组件化添加模块</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/08/11/LaunchScreen/">LaunchScreen</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/07/08/Https%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B/">Https四次握手</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/07/08/NSURLComponents/">NSURLComponents</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/07/03/appStore%E5%AE%A1%E6%A0%B8%E8%B8%A9%E5%9D%91%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD/">appStore审核踩坑未完待续</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/06/29/TCP%E5%8D%8F%E8%AE%AE%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/">TCP协议三次握手和四次挥手</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/06/13/%E4%B8%80%E9%94%AE%E7%99%BB%E5%BD%95%E5%8A%9F%E8%83%BD%E5%B0%8F%E7%BB%93/">一键登录功能小结</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/06/03/githubusercontent443/">githubusercontent443</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/05/01/fastlane%E8%87%AA%E5%8A%A8%E6%89%93%E5%8C%85%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B/">fastlane自动打包详细流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/04/03/selector%20%E3%80%81SEL%20%E3%80%81@selector(SEL%E5%8E%9F%E7%90%86)/">selector 、SEL 、@selector(SEL原理)</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/03/03/iOS%E5%86%85%E8%B4%AD%E6%80%BB%E7%BB%93/">iOS内购总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/18/%E4%BB%A3%E7%90%86-%E9%80%9A%E7%9F%A5-Block%E7%9A%84%E5%8C%BA%E5%88%AB/">代理-通知-Block的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/13/NSNotificationCenter%E9%80%9A%E7%9F%A5%E7%9A%84%E5%8E%9F%E7%90%86/">NSNotificationCenter通知的原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/01/iOS%E5%9B%BE%E7%89%87%E5%83%8F%E7%B4%A0RGBA%E5%A4%84%E7%90%86/">iOS图片像素RGBA处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/01/autorelease%E5%92%8CAutoreleasepool/">autorelease和Autoreleasepool</a></li><li class="post-list-item"><a class="post-list-link" href="/2022/02/01/%E4%BB%80%E4%B9%88%E6%98%AF%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0/">什么是内联函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/12/29/%E9%93%B6%E8%A1%8C%E5%AE%B6%E7%AE%97%E6%B3%95/">银行家算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/12/01/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/">时间复杂度</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/11/15/iOS%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">iOS内存管理</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/11/06/MQTT%E8%AF%A6%E8%A7%A3%E5%8F%8A%E4%BD%BF%E7%94%A8/">MQTT详解及使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/11/03/XMPP%E4%B8%8EMQTT%E5%8C%BA%E5%88%AB/">XMPP与MQTT区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/10/06/%E7%BA%BF%E7%A8%8B%E5%92%8C%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB/">线程和进程的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/09/16/%E7%BA%BF%E7%A8%8B%E6%AD%BB%E9%94%81%E7%9A%84%E5%9B%9B%E4%B8%AA%E6%9D%A1%E4%BB%B6/">线程死锁的四个条件</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/08/15/GCD%E8%AF%A6%E8%A7%A3/">GCD详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/07/11/pthread-NSThread-GCD%E7%9A%84%E5%8C%BA%E5%88%AB/">pthread-NSThread-GCD的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/11/Runtime%E5%BA%94%E7%94%A8/">Runtime应用</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/10/Runtime%E6%B6%88%E6%81%AF%E5%8F%91%E9%80%81%E5%92%8C%E6%B6%88%E6%81%AF%E8%BD%AC%E5%8F%91/">Runtime消息发送和消息转发</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/06/Category/">Category</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/03/Runtime%E5%9F%BA%E6%9C%AC%E4%BA%86%E8%A7%A3/">Runtime基本了解</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/06/01/%E5%AF%B9%E8%B1%A1%E3%80%81%E7%B1%BB%E3%80%81%E5%85%83%E7%B1%BB%E7%9A%84%E5%85%B3%E7%B3%BB/">对象、类、元类的关系</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/05/12/iOS%E7%BC%96%E5%86%99%E8%A7%84%E8%8C%83%E6%80%BB%E7%BB%93/">iOS编写规范总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/04/12/RunLoop%E5%BA%95%E5%B1%82/">RunLoop底层</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/12/iOS%E6%8E%A8%E9%80%81%E5%8E%9F%E7%90%86/">iOS推送原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/02/Pod%E4%B8%AD%E8%8E%B7%E5%8F%96%E5%9B%BE%E7%89%87%E8%BF%9B%E8%A1%8C%E5%80%8D%E5%9B%BE%E7%9A%84%E9%80%82%E9%85%8D/">Pod中获取图片进行倍图的适配</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/02/iCarousel%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E/">iCarousel使用说明</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/02/01/setValue%E5%92%8CsetObject%E7%9A%84%E5%8C%BA%E5%88%AB/">setValue和setObject的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/21/BeeHive%E6%A1%86%E6%9E%B6%E7%90%86%E8%A7%A3/">BeeHive框架理解</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/20/iOS%E6%8C%81%E4%B9%85%E5%8C%96%E6%96%B9%E5%BC%8F/">setValue和setObject的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/10/app%E6%89%93%E5%BC%80%E5%B0%8F%E7%A8%8B%E5%BA%8F/">setValue和setObject的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2021/01/01/KVO/">KVO</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/12/21/KVC/">KVC</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/10/11/%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE%E5%9B%A2%E9%98%9F%E7%9A%84%E5%85%AC%E5%85%B1%E7%BB%84%E4%BB%B6%E7%A7%81%E6%9C%89%E5%BA%93/">创建项目团队的公共组件私有库</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/09/12/git%E5%88%9B%E5%BB%BA%E7%89%88%E6%9C%AC%E5%BA%93%E5%91%BD%E4%BB%A4/">git创建版本库命令</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/08/12/%E6%9C%AC%E5%9C%B0%E7%A7%81%E6%9C%89%E5%BA%93%E5%88%9B%E5%BB%BA%E4%B8%8E%E4%BD%BF%E7%94%A8/">本地私有库创建与使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/06/12/Block%E5%8E%9F%E7%90%86%E4%BB%A5%E5%8F%8A%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8%E9%97%AE%E9%A2%98/">Block原理以及循环引用问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/05/15/FOUNDATION_EXTERN,UIKIT_EXTERN,#define,static%E5%85%B3%E9%94%AE%E5%AD%97/">FOUNDATION_EXTERN,UIKIT_EXTERN,#define,static关键字</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/15/OC%E4%B8%ADweak%E7%9A%84%E7%90%86%E8%A7%A3/">OC中weak的理解</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/03/25/%E5%93%88%E5%B8%8C%E8%A1%A8/">哈希表</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/03/15/atomic%E5%92%8Cnonatomic%E5%8C%BA%E5%88%AB/">atomic和nonatomic区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/02/11/copy%E5%92%8CmutableCopy/">copy和mutableCopy</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/01/09/nil-Nil-NULL-NSNull/">nil-Nil-NULL-NSNull</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/01/05/property%E3%80%81synthesize%E3%80%81dynamic/">property、synthesize、dynamic</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/15/iOS%E7%AD%BE%E5%90%8D%E8%AE%A4%E8%AF%81%E8%BF%87%E7%A8%8B/">iOS签名认证过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/08/removeFromSuperview%E8%AF%A6%E8%A7%A3/">removeFromSuperview详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/01/iOS%E5%93%8D%E5%BA%94%E9%93%BE%E4%B9%8B%E4%BA%8B%E4%BB%B6%E4%BC%A0%E9%80%92%E5%92%8C%E5%93%8D%E5%BA%94/">iOS响应链之事件传递和响应</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/17/iOSView%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/">iOSView的生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/10/Hexo%E4%BD%BF%E7%94%A8/">Hexo使用</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2024 Haven
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo &nbsp;&nbsp;</a><a href="https://github.com/maochunguang" target="_blank">Blog</a> by tommy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>
